@@ -1,12 +1,12 @@
 <!--
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-04 10:49:58
+ * @LastEditTime: 2020-10-06 20:28:25
  * @FilePath: \book\src\App.vue
 -->
 <template lang="pug">
   #app
-    nav-bar(@handleNavLogin="loginDialog")/
+    nav-bar(@handleNavLogin="loginDialog", :userPhoto="photoUrl")/
     //- login-dialog(:loginVisableSon="loginVisable", @closeDialog="closeLoginDialog")
     el-dialog(
       :visible.sync="loginVisable",
@@ -14,6 +14,7 @@
       close-on-click-modal=false,
       show-close=false,
       top="20vh",
+      close="getPhotoUrl",
     )
       login-dialog(@closeLogin="closeLoginDialog")
       //- login-dialog/
@@ -25,6 +26,11 @@
 import NavBar from './components/NavBar.vue'
 import loginDialog from './components/LoginDialog.vue';
 export default {
+  provide() {
+    return {
+      fresh: this.freshPhotoUrl
+    }
+  },
   name: 'app',
   components: {
     NavBar,
@@ -34,16 +40,32 @@ export default {
     return {
      // 登录组件显隐
       loginVisable: false,
+      photoUrl: ''
     }
   },
   methods: {
     loginDialog() {
       this.loginVisable = true
     },
-    closeLoginDialog() {
+    closeLoginDialog(val) {
+      this.photoUrl = val
+      window.localStorage.setItem('userPhoto', val)
       this.loginVisable = false
+    },
+    // getPhotoUrl() {
+    //   this.$http.get('').then(res => {
+    //     if(res) {
+    //       this.photoUrl = res.data
+    //     }
+    //   })
+    // }
+    freshPhotoUrl() {
+      this.photoUrl = window.localStorage.getItem('userPhoto')
     }
   },
+  created() {
+    this.freshPhotoUrl()
+  }
 }
 </script>
 
@@ -83,11 +105,5 @@ body::-webkit-scrollbar-track {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-@media (max-width: 780px) {
-  #app::before {
-  content: '请到PC端浏览以获得更好的体验';
-  color: #777
-}
 }
 </style>

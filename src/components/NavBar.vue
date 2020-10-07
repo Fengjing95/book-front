@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-04 09:50:40
+ * @LastEditTime: 2020-10-06 21:54:13
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -10,9 +10,10 @@
     :default-active="route",
     mode="horizontal",
     active-text-color="#409eff",
+    
     router
   )
-    el-menu-item(index="")
+    el-menu-item()
       img.logo(src="../assets/image/book-logo.png", @click="$router.push('/')")
     el-menu-item(
       v-for="item in menu",
@@ -41,6 +42,10 @@
 <script>
 import {mapGetters} from 'vuex'
 export default {
+  props: {
+    // 用户头像
+    userPhoto: String
+  },
   data() {
     return {
       // 菜单项
@@ -53,10 +58,9 @@ export default {
       ],
       // 下拉列表项
       list: [
+        {icon: 'el-icon-user', command: 'personal', name: '个人中心'},
         {icon: 'el-icon-switch-button', command: 'quit', name: '退出'},
       ],
-      // 用户头像
-      userPhoto: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
     };
   },
   computed: {
@@ -83,6 +87,8 @@ export default {
             }
           )
           break;
+        case 'personal':
+          this.$router.push('/personal')
       }
     },
     // 获取用户信息，提取头像地址
@@ -106,19 +112,25 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-menu.el-menu--horizontal {
+  border-bottom: none;
+}
 .nav-bar {
   position: sticky;
   top: 0;
   min-width: 1035px;
+  // background-color: #e6e6e6;
+  border-bottom: solid 1px rgb(207, 206, 206);
   .el-menu {
     .logo {
       width: 130px;
       height: 45px;
     }
-    width: 60%;
-    // min-width: 400px;
-    padding-left: 20%;
-    padding-right: 20%;
+    width: 1000px;
+    margin: 0 auto;
+    // min-width: 1000px;
+    // padding-left: 20%;
+    // padding-right: 20%;
     .list {
       float: right;
       margin-top: 10px;
@@ -128,21 +140,21 @@ export default {
       margin-top: 10px;
     }
   }
-  @media screen and (max-width: 780px) {
-    width: 100%;
-    min-width: 780px;
-    .el-menu {
-      // width: ;
-      min-width: 780px;
-      .logo {
-        display: none;
-      }
-      padding-left: 0;
-      padding-right: 0;
-      // .btn {
-      //   display: none;
-      // }
-    }
-  }
+  // @media screen and (max-width: 780px) {
+  //   width: 100vw;
+  //   min-width: 780px;
+  //   .el-menu {
+  //     // width: ;
+  //     min-width: 780px;
+  //     .logo {
+  //       display: none;
+  //     }
+  //     padding-left: 0;
+  //     padding-right: 0;
+  //     // .btn {
+  //     //   display: none;
+  //     // }
+  //   }
+  // }
 }
 </style>

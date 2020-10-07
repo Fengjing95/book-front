@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-09-25 08:11:24
+ * @LastEditTime: 2020-10-07 08:48:02
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -16,8 +16,12 @@ import md5 from 'md5';
 // md5:密码加密使用
 Vue.prototype.$md5 = md5
 
+// 拼接图片地址
+Vue.prototype.$photoHeader = 'http://192.168.1.137:8080/'
+
 Vue.config.productionTip = false
 
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 axios.defaults.withCredentials = true // 跨域
 axios.defaults.baseURL = '/api' // baseUrl:方便修改http地址
 
@@ -46,7 +50,19 @@ axios.interceptors.response.use(response => {
       case 402:
         Message({
           type: 'error',
-          message: '密码错误'
+          message: error.response.data.msg
+        });
+        break;
+      case 405:
+        Message({
+          type: 'error',
+          message: error.response.data.msg
+        });
+        break;
+      default:
+        Message({
+          type: 'error',
+          message: error.response.data.msg
         });
         break;
     }

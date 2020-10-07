@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:03:40
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-04 19:21:22
+ * @LastEditTime: 2020-10-06 14:57:31
  * @FilePath: \book\src\components\LoginDialog.vue
 -->
 <template lang="pug">
@@ -106,19 +106,24 @@ export default {
         if (valid) {
           // 加密
           let md5Form = {
-            username: this.loginForm,
+            phone: this.loginForm.username,
             password: this.$md5(this.loginForm.password)
           }
-          // md5Form.password = this.$md5(this.loginForm.password)
+          // console.log(this.$md5(this.loginForm.password));
           // 发送账号密码
-          this.$http.post('账密登录API', md5Form).then(res => {
+          this.$http.post('/user/login', md5Form).then(res => {
             if(res) {
-              res
+              // console.log(res.data.obj);
+              this.$message({
+                type: "success",
+                message: '登录成功'
+              })
               // 处理token
+              window.localStorage.setItem('token', res.data.obj.token)
               // 更新vuex中的状态
               this.$store.commit('freshToken')
               // 登录成功之后关闭对话框
-              this.$emit("closeLogin")
+              this.$emit("closeLogin", this.$photoHeader + res.data.obj.image);
             }
           })
         }
@@ -129,15 +134,25 @@ export default {
         .validate()
         .catch((err) => err)
       if (valid && this.phoneForm.verCode !== "") {
+        const pvobj = {
+          phone: this.phoneForm.phone,
+          code: this.phoneForm.verCode
+        }
         // 发送手机号和验证码
-        this.$http.post('手机登录API', this.phoneForm).then(res => {
+        this.$http.post('/user/plogin', pvobj).then(res => {
           if(res) {
-            res
+            console.log(res);
+            this.$message({
+                type: "success",
+                message: '登录成功'
+              })
             // 处理token
+            window.localStorage.setItem('token', res.data.obj.token)
             // 更新vuex中的状态
-              this.$store.commit('freshToken')
+            this.$store.commit('freshToken')
             // 登录成功之后关闭对话框
-            this.$emit("closeLogin");
+              console.log(this.$photoHeader + res.data.obj.image);
+            this.$emit("closeLogin", this.$photoHeader + res.data.obj.image);
           }
         })
       } else if(valid && this.phoneForm.verCode === "") {
@@ -159,8 +174,15 @@ export default {
       this.$refs["phoneFormRef"].validate((valid) => {
         if (valid) {
           // 发送请求
-          this.$http.post('发送验证码API', this.phoneForm.phone).then(res => {
+          const pobj = {
+            phone: this.phoneForm.phone
+          }
+          this.$http.post('/user/getsms', pobj).then(res => {
             if(res) {
+              this.$message({
+                type: "success",
+                message: '发送成功'
+              })
               res
               // 成功开始计时
               this.canGetCode = true;
@@ -180,7 +202,7 @@ export default {
       });
     },
     updatePassword() {
-      this.$emit("closeLogin")
+      this.$emit("closeLogin", '')
       this.$router.push('/update-password')
     }
   },

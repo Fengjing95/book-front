@@ -1,13 +1,22 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-03 19:03:27
+ * @LastEditTime: 2020-10-07 13:05:41
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '../store'
 
 Vue.use(VueRouter)
+
+// 解决路由重复带来的报错
+//获取原型对象上的push函数
+const originalPush = VueRouter.prototype.push
+//修改原型对象中的push方法
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 const routes = [
   {
@@ -20,6 +29,20 @@ const routes = [
     name: 'About',
     component: () => import('../views/About')
   },
+  {
+    path: '/personal',
+    name: 'Personal',
+    component: () => import('../views/Personal'),
+    // 导航守卫，没有登录不可以进入个人中心
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getToken) {
+        next()
+      } else {
+        next(from.path)
+      }
+      
+    }
+  }
 ]
 
 const router = new VueRouter({
