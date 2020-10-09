@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-06 09:34:01
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-07 15:53:49
+ * @LastEditTime: 2020-10-08 16:03:42
  * @FilePath: \book\src\views\Personal.vue
 -->
 <template lang="pug">
@@ -12,16 +12,34 @@
       :show-file-list="false",
       :on-success="handleAvatarSuccess",
       :before-upload="beforeAvatarUpload",
-      :headers="{ authorization: token }"
+      :headers="{ authorization: token }",
+      :on-error="handleAvatarFailed",
     )
       img.avatar(v-if="imageUrl", :src="imageUrl")
       i.el-icon-plus.avatar-uploader-icon(v-else)
     .avatar-des
       p 点击更换
     .title-name
-      h2 {{userInfo.name}}
-  .info-content
-    p 123
+      h2 {{userInfo.userName}}
+  .tips-text
+    h2 个人资料
+  .personal-content
+    el-container
+      el-aside.aside(width="196px")
+        el-menu(:default-active="defaultRoute",router)
+          el-menu-item(
+            v-for="item in routeObj",
+            :key="item.route",
+            :index="item.route",
+          ) {{item.menuItem}}
+      //- el-divider(direction="vertical")
+      el-container
+        el-header
+          .header-title 
+            i(:class="$route.meta.subtitleIcon", style="margin-right: 10px;") 
+            span {{$route.meta.subtitle}}
+        el-main
+         router-view/
 </template>
 
 <script>
@@ -29,42 +47,77 @@ export default {
   inject: ['fresh'],
   data() {
     return {
-      userInfo: {
-        name: '屁哦里啪啦'
-      },
+      userInfo: {},
       token: localStorage.getItem("token"),
-      imageUrl: window.localStorage.getItem('userPhoto')
+      imageUrl: window.localStorage.getItem('userPhoto'),
+      routeObj: [
+        {menuItem: '我的信息', route: '/personal'},
+        {menuItem: '我的阅历', route: '/personal/record'},
+        {menuItem: '编辑信息', route: '/personal/setting'},
+      ]
     };
   },
+  computed: {
+    defaultRoute() {
+       return this.$route.path
+    }
+  },
   methods: {
-    getUserInfo() {},
-    uploadUserInfo() {},
-    uploadPassword() {},
-    hasPassword() {},
+    // 获取用户信息
+    getUserInfo() {
+      this.$http.get('/user/getinfo').then(
+        res => {
+          if(res) {
+            this.userInfo = res.data.obj
+          }
+        }
+      )
+    },
+    // 上传失败回调
+    handleAvatarFailed(error) {
+      // 提取状态码
+      const err = error.toString()
+      const code = err.match(/[4|5]0[0-9]$/)
+      switch(parseInt(code)) {
+        case 403:
+          this.$message.error('token过期或被篡改请重新登陆')
+          window.localStorage.clear()
+          this.$store.commit('freshToken')
+          this.$router.push('/')
+          break
+        case 406:
+          this.$message.error('保存失败，建议重新登陆再试')
+          break
+        default:
+          this.$message.error('连接服务器失败')
+          break
+      }
+    },
     // 上传成功回调
     handleAvatarSuccess(res, file) {
-      // console.log(res);
+      this.$message.success('更换头像成功')
       this.imageUrl = URL.createObjectURL(file.raw)
       window.localStorage.setItem('userPhoto', this.$photoHeader + res.obj)
-      // setTimeout(() => {
-        this.fresh();
-      // }, 1000)
+      this.fresh()
+      // console.log(res)
     },
     // 上传前检查
     beforeAvatarUpload(file) {
-      const isImg = file.type === "image/jpeg" || file.type === "image/png";
+      const isImg = file.type === "image/jpeg" || file.type === "image/png"
       const isLt5M = file.size / 1024 / 1024 < 5;
 
       if (!isImg) {
-        this.$message.error("上传头像图片只能是 JPG/PNG 格式!");
+        this.$message.error("上传头像图片只能是 JPG/PNG 格式!")
       }
       if (!isLt5M) {
-        this.$message.error("上传头像图片大小不能超过 5MB!");
+        this.$message.error("上传头像图片大小不能超过 5MB!")
       }
-      return isImg && isLt5M;
+      return isImg && isLt5M
     },
   },
-  created() {}
+  created() {
+    this.getUserInfo()
+  }
 };
 </script>
 
@@ -73,6 +126,7 @@ export default {
   width: 1000px;
   margin: 0 auto;
   .header-show {
+    margin-top: 1px;
     width: 1000px;
     height: 300px;
     position: relative;
@@ -140,6 +194,24 @@ export default {
       h2 {
         color: #f5f5f5;
       }
+    }
+  }
+  .tips-text {
+    height:53.5px;
+    border-bottom: solid 2px #777;
+    h2 {
+      float: left;
+      border-bottom: solid 2px #409eff;
+      padding: 0 50px
+    }
+  }
+  .personal-content {
+    margin-top: 20px;
+    clear: both;
+    .header-title {
+      text-align: left;
+      background-color: #f5f5f5;
+      padding: 10px 20px;
     }
   }
 }

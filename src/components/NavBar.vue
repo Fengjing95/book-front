@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-06 21:54:13
+ * @LastEditTime: 2020-10-09 08:57:36
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -13,7 +13,7 @@
     
     router
   )
-    el-menu-item()
+    el-menu-item.item-logo
       img.logo(src="../assets/image/book-logo.png", @click="$router.push('/')")
     el-menu-item(
       v-for="item in menu",
@@ -75,12 +75,18 @@ export default {
     handleCommand(command) {
       switch(command) {
         case 'quit':
-          window.localStorage.clear()
-          this.$store.commit('freshToken')
-          this.$message({
-            type: 'success',
-            message: '退出成功'
-          })
+          this.$http.get('/user/logout').then(
+            res => {
+              if(res) {
+                this.$message({
+                  type: 'success',
+                  message: '退出成功'
+                })
+                window.localStorage.clear()
+                this.$store.commit('freshToken')
+              }
+            }
+          )
           this.$router.push('/').catch(
             error => {
               error // 拦截错误：首页退出会报错，因为相同路由跳转两次
@@ -122,9 +128,12 @@ export default {
   // background-color: #e6e6e6;
   border-bottom: solid 1px rgb(207, 206, 206);
   .el-menu {
-    .logo {
-      width: 130px;
-      height: 45px;
+    .item-logo {
+      border-bottom: none;
+      .logo {
+        width: 130px;
+        height: 45px;
+      }
     }
     width: 1000px;
     margin: 0 auto;

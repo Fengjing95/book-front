@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-07 13:05:41
+ * @LastEditTime: 2020-10-08 15:33:57
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
@@ -31,7 +31,6 @@ const routes = [
   },
   {
     path: '/personal',
-    name: 'Personal',
     component: () => import('../views/Personal'),
     // 导航守卫，没有登录不可以进入个人中心
     beforeEnter: (to, from, next) => {
@@ -41,7 +40,33 @@ const routes = [
         next(from.path)
       }
       
-    }
+    },
+    children: [
+      {
+        path: '',
+        component: () => import('../components/PersonalInfo'),
+        meta: {
+          subtitle: '我的信息',
+          subtitleIcon: 'el-icon-user'
+        }
+      },
+      {
+        path: 'setting',
+        component: () => import('../components/PersonalSetting'),
+        meta: {
+          subtitle: '编辑信息',
+          subtitleIcon: 'el-icon-edit'
+        }
+      },
+      {
+        path: 'record',
+        component: () => import('../components/PersonalRecord'),
+        meta: {
+          subtitle: '我的阅历',
+          subtitleIcon: 'el-icon-notebook-1'
+        }
+      }
+    ]
   }
 ]
 

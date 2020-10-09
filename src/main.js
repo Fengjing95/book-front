@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-07 08:48:02
+ * @LastEditTime: 2020-10-08 16:37:23
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -59,6 +59,15 @@ axios.interceptors.response.use(response => {
           message: error.response.data.msg
         });
         break;
+      case 403:
+        Message({
+          type: 'error',
+          message: 'token过期或被篡改请重新登陆'
+        });
+        window.localStorage.clear()
+        store.commit('freshToken')
+        router.push('/')
+        break;
       default:
         Message({
           type: 'error',
@@ -82,6 +91,14 @@ Vue.filter('formatDate', function (date) {
   const n = new Date(date)
   return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate()
     + ' ' + n.getHours() + ':' + n.getMinutes() + ':' + n.getSeconds()
+})
+// 挂载过滤器=>隐藏手机号中间4位
+Vue.filter('hidePhone', function (val) {
+  const reg = /^(\d{3})\d{4}(\d{4})$/
+  if (val) {
+    val = val.replace(reg, "$1****$2")
+  }
+  return val
 })
 
 new Vue({

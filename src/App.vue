@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-06 20:28:25
+ * @LastEditTime: 2020-10-08 19:25:26
  * @FilePath: \book\src\App.vue
 -->
 <template lang="pug">
@@ -12,13 +12,12 @@
       :visible.sync="loginVisable",
       width="380px",
       close-on-click-modal=false,
-      show-close=false,
       top="20vh",
       close="getPhotoUrl",
     )
       login-dialog(@closeLogin="closeLoginDialog")
       //- login-dialog/
-    router-view/
+    router-view(v-if="isRouterAlive")/
     
 </template>
 
@@ -28,7 +27,8 @@ import loginDialog from './components/LoginDialog.vue';
 export default {
   provide() {
     return {
-      fresh: this.freshPhotoUrl
+      fresh: this.freshPhotoUrl,
+      reload: this.reload
     }
   },
   name: 'app',
@@ -40,7 +40,8 @@ export default {
     return {
      // 登录组件显隐
       loginVisable: false,
-      photoUrl: ''
+      photoUrl: '',
+      isRouterAlive: true
     }
   },
   methods: {
@@ -61,6 +62,12 @@ export default {
     // }
     freshPhotoUrl() {
       this.photoUrl = window.localStorage.getItem('userPhoto')
+    },
+    reload() {
+      this.isRouterAlive = false
+      this.$nextTick(function() {
+        this.isRouterAlive = true
+      })
     }
   },
   created() {

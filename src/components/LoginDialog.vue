@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:03:40
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-06 14:57:31
+ * @LastEditTime: 2020-10-08 21:31:47
  * @FilePath: \book\src\components\LoginDialog.vue
 -->
 <template lang="pug">
@@ -183,7 +183,6 @@ export default {
                 type: "success",
                 message: '发送成功'
               })
-              res
               // 成功开始计时
               this.canGetCode = true;
               let timer = this.COUNT_TIME;
