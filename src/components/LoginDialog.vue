@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:03:40
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-08 21:31:47
+ * @LastEditTime: 2020-10-09 09:20:17
  * @FilePath: \book\src\components\LoginDialog.vue
 -->
 <template lang="pug">
@@ -25,6 +25,7 @@
         el-input(
           placeholder="请输入密码",
           v-model="loginForm.password",
+          @keyup.enter.native="login"
           show-password
         )
   .dialog-footer(slot="footer")

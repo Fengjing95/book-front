@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-08 14:54:06
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-09 08:55:35
+ * @LastEditTime: 2020-10-09 09:43:45
  * @FilePath: \book\src\components\PersonalSetting.vue
 -->
 <template lang="pug">
@@ -19,7 +19,8 @@
           label="昵称",
           prop="userName"
         )
-          el-input(v-model="newUsername.userName")
+          el-input(v-model="newUsername.userName", @keyup.enter.native="updateUsername")
+          input(type="text", style="display:none")
         el-form-item
           el-button(
             type="primary",
@@ -59,7 +60,9 @@
             placeholder="输入新密码",
             type="password",
             name="rePwdNew",
-            autocomplete="new-password"
+            autocomplete="new-password",
+            @keyup.enter.native="updatePassword",
+            show-password
           )
       div(slot="footer")
         el-button(@click="updatePassword", type="primary") 修改

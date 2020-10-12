@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-06 09:34:01
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-08 16:03:42
+ * @LastEditTime: 2020-10-09 09:25:11
  * @FilePath: \book\src\views\Personal.vue
 -->
 <template lang="pug">
@@ -171,6 +171,7 @@ export default {
         width: 148px;
         height: 148px;
         display: block;
+        object-fit: cover;
       }
     }
     .avatar-des {

@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-09 08:57:36
+ * @LastEditTime: 2020-10-10 18:57:27
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -59,6 +59,7 @@ export default {
       // 下拉列表项
       list: [
         {icon: 'el-icon-user', command: 'personal', name: '个人中心'},
+        {icon: 'el-icon-date', command: 'attendance', name: '每日签到'},
         {icon: 'el-icon-switch-button', command: 'quit', name: '退出'},
       ],
     };
@@ -95,6 +96,10 @@ export default {
           break;
         case 'personal':
           this.$router.push('/personal')
+          break
+        case 'attendance':
+          this.changeAttendanceDialogStatus()
+          break
       }
     },
     // 获取用户信息，提取头像地址
@@ -108,6 +113,9 @@ export default {
     // 显示登录对话框
     changeLoginDialogStauts() {
       this.$emit("handleNavLogin")
+    },
+    changeAttendanceDialogStatus() {
+      this.$emit("handleAttendance")
     }
   },
   created () {
@@ -122,6 +130,7 @@ export default {
   border-bottom: none;
 }
 .nav-bar {
+  background-color: #fff;
   position: sticky;
   top: 0;
   min-width: 1035px;

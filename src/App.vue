@@ -1,12 +1,16 @@
 <!--
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-08 19:25:26
+ * @LastEditTime: 2020-10-11 15:44:50
  * @FilePath: \book\src\App.vue
 -->
 <template lang="pug">
   #app
-    nav-bar(@handleNavLogin="loginDialog", :userPhoto="photoUrl")/
+    nav-bar(
+      @handleNavLogin="loginDialog",
+      :userPhoto="photoUrl",
+      @handleAttendance="displayAttendance"
+    )/
     //- login-dialog(:loginVisableSon="loginVisable", @closeDialog="closeLoginDialog")
     el-dialog(
       :visible.sync="loginVisable",
@@ -14,16 +18,19 @@
       close-on-click-modal=false,
       top="20vh",
       close="getPhotoUrl",
+      :destroy-on-close	="true"
     )
       login-dialog(@closeLogin="closeLoginDialog")
       //- login-dialog/
+    daily-attendance(ref="attendanceRef")/
     router-view(v-if="isRouterAlive")/
     
 </template>
 
 <script>
 import NavBar from './components/NavBar.vue'
-import loginDialog from './components/LoginDialog.vue';
+import loginDialog from './components/LoginDialog.vue'
+import DailyAttendance from './components/Attendance/DailyAttendance.vue'
 export default {
   provide() {
     return {
@@ -34,7 +41,8 @@ export default {
   name: 'app',
   components: {
     NavBar,
-    loginDialog
+    loginDialog,
+    DailyAttendance
   },
   data() {
     return {
@@ -68,6 +76,9 @@ export default {
       this.$nextTick(function() {
         this.isRouterAlive = true
       })
+    },
+    displayAttendance() {
+      this.$refs.attendanceRef.displayAttDialog()
     }
   },
   created() {

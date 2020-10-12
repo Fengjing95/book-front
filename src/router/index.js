@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-08 15:33:57
+ * @LastEditTime: 2020-10-11 15:44:20
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
@@ -44,7 +44,7 @@ const routes = [
     children: [
       {
         path: '',
-        component: () => import('../components/PersonalInfo'),
+        component: () => import('../components/Personal/PersonalInfo'),
         meta: {
           subtitle: '我的信息',
           subtitleIcon: 'el-icon-user'
@@ -52,7 +52,7 @@ const routes = [
       },
       {
         path: 'setting',
-        component: () => import('../components/PersonalSetting'),
+        component: () => import('../components/Personal/PersonalSetting'),
         meta: {
           subtitle: '编辑信息',
           subtitleIcon: 'el-icon-edit'
@@ -60,7 +60,7 @@ const routes = [
       },
       {
         path: 'record',
-        component: () => import('../components/PersonalRecord'),
+        component: () => import('../components/Personal/PersonalRecord'),
         meta: {
           subtitle: '我的阅历',
           subtitleIcon: 'el-icon-notebook-1'

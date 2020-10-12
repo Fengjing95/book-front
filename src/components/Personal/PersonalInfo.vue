@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-08 12:24:08
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-08 18:05:19
+ * @LastEditTime: 2020-10-09 09:22:07
  * @FilePath: \book\src\components\PersonalInfo.vue
 -->
 <template lang="pug">
@@ -61,6 +61,7 @@
     display:inline-block;
     text-align: left;
     i {
+      font-size: 25px;
       color: #409eff;
       margin-right: 20px;
     }

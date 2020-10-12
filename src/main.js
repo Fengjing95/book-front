@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-08 16:37:23
+ * @LastEditTime: 2020-10-12 09:02:38
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
