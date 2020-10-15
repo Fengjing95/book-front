@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-12 09:02:38
+ * @LastEditTime: 2020-10-15 15:35:30
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -99,6 +99,31 @@ Vue.filter('hidePhone', function (val) {
     val = val.replace(reg, "$1****$2")
   }
   return val
+})
+// 挂载过滤器=>计算时间差
+Vue.filter('intervalTime', function (startTime) {
+  const endTime = new Date().getTime()
+  const date = endTime - startTime
+
+  // 计算相差天数
+  const day = Math.floor(date / (24 * 3600 * 1000))
+  // 计算相差小时
+  const date2 = date % (24 * 3600 * 1000)
+  const hour = Math.floor(date2 / (3600 * 1000))
+  // 计算相差分钟
+  const date3 = date2 % (3600 * 1000)
+  const minutes = Math.floor(date3 / (60 * 1000))
+  let result = ''
+  if (day) {
+    result = day + '天之前' 
+  } else if (hour) {
+    result = hour + '小时之前'
+  } else if (minutes) {
+    result = minutes + '分钟之前'
+  } else {
+    result = '刚刚'
+  }
+  return result
 })
 
 new Vue({

@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-10 18:57:27
+ * @LastEditTime: 2020-10-15 13:22:53
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -37,6 +37,13 @@
     //- .list(v-else)
     .btn(v-else)
       el-button(type="primary", @click="changeLoginDialogStauts") 登录
+    .search-box
+      input(
+        type="text",
+        v-model="searchText",
+        @keyup.enter="search"
+      )
+      i.el-icon-search(@click="search")
 </template>
 
 <script>
@@ -48,6 +55,7 @@ export default {
   },
   data() {
     return {
+      searchText: '',
       // 菜单项
       menu: [
         { route: "/", name: "首页" },
@@ -72,6 +80,11 @@ export default {
     },
   },
   methods: {
+    // TODO: 搜索功能
+    // 搜索
+    search() {
+      console.log(this.searchText);
+    },
     // 头像下拉列表指令
     handleCommand(command) {
       switch(command) {
@@ -133,9 +146,11 @@ export default {
   background-color: #fff;
   position: sticky;
   top: 0;
+  // 防止导航栏被遮挡
+  z-index: 999;
   min-width: 1035px;
   // background-color: #e6e6e6;
-  border-bottom: solid 1px rgb(207, 206, 206);
+  border-bottom: solid 1px rgb(167, 165, 165);
   .el-menu {
     .item-logo {
       border-bottom: none;
@@ -152,6 +167,29 @@ export default {
     .list {
       float: right;
       margin-top: 10px;
+    }
+    .search-box {
+      width: 200px;
+      margin-top: 9px;
+      margin-right: 30px;
+      height: 40px;
+      float: right;
+      border: solid 1px #777;
+      border-radius: 20px;
+      input {
+        width: 160px;
+        border: none;
+        outline: none;
+        height: 40px;
+        line-height: 40px;
+        font-size: 16px;
+        background-color: rgba(0,0,0,0);
+        text-indent: 10px;
+        color: #777;
+      }
+      i {
+        padding: 0 10px;
+      }
     }
     .btn {
       float: right;

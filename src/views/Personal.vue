@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-06 09:34:01
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-09 09:25:11
+ * @LastEditTime: 2020-10-13 10:41:45
  * @FilePath: \book\src\views\Personal.vue
 -->
 <template lang="pug">
@@ -33,12 +33,12 @@
             :index="item.route",
           ) {{item.menuItem}}
       //- el-divider(direction="vertical")
-      el-container
-        el-header
+      el-container(style="margin-left:10px;")
+        el-header(style="padding: 0;")
           .header-title 
             i(:class="$route.meta.subtitleIcon", style="margin-right: 10px;") 
             span {{$route.meta.subtitle}}
-        el-main
+        el-main(style="background-color: #fff;")
          router-view/
 </template>
 

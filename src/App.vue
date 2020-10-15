@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-11 15:44:50
+ * @LastEditTime: 2020-10-14 13:54:01
  * @FilePath: \book\src\App.vue
 -->
 <template lang="pug">
@@ -23,7 +23,10 @@
       login-dialog(@closeLogin="closeLoginDialog")
       //- login-dialog/
     daily-attendance(ref="attendanceRef")/
-    router-view(v-if="isRouterAlive")/
+    el-backtop/
+    keep-alive
+      router-view(v-if="isRouterAlive && $route.meta.keepAlive")/
+    router-view(v-if="isRouterAlive && !$route.meta.keepAlive")/
     
 </template>
 
@@ -90,6 +93,7 @@ export default {
 <style>
 body {
   margin: 0 auto;
+  background-color: #EDEEF3;
 }
 body::-webkit-scrollbar {
   /*滚动条整体样式*/

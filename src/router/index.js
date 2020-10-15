@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-11 15:44:20
+ * @LastEditTime: 2020-10-15 19:03:15
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
@@ -38,8 +38,7 @@ const routes = [
         next()
       } else {
         next(from.path)
-      }
-      
+      }   
     },
     children: [
       {
@@ -67,6 +66,38 @@ const routes = [
         }
       }
     ]
+  },
+  {
+    path: '/discussion',
+    component: () => import('../views/Discussion'),
+    meta: {
+      keepAlive: true,
+      isBack: false
+    },
+  },
+  {
+    path: '/discussion/:id',
+    name: 'Discussion',
+    props: (route) => ({ bdId: route.params.id }),
+    component: () => import('../views/DiscussionDetail'),
+    meta: {
+      keepAlive: true,
+      isBack: false
+    },
+    // 未登录不能进入书圈详情，书圈详情需要token
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getToken) {
+        next()
+      } else {
+        next(from.path)
+      }
+    },
+  },
+  {
+    path: '/dynamic/:id',
+    name: 'Dynamic',
+    props: (route) => ({ dynamicId: route.params.id }),
+    component: () => import('../views/Dynamic'),
   }
 ]
 

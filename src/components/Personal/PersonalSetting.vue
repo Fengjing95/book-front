@@ -1,8 +1,8 @@
 <!--
  * @Date: 2020-10-08 14:54:06
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-09 09:43:45
- * @FilePath: \book\src\components\PersonalSetting.vue
+ * @LastEditTime: 2020-10-12 09:57:35
+ * @FilePath: \book\src\components\Personal\PersonalSetting.vue
 -->
 <template lang="pug">
   .persaonal-setting
@@ -114,15 +114,19 @@
         )
       },
       updateUsername() {
-        this.$http.post('/user/updateusername', this.newUsername).then(
-          res => {
-            if(res) {
-              res
-              this.$message.success('修改成功')
-              this.reload()
-            }
+        this.$refs['usernameRef'].validate((valid) => {
+          if(valid) {
+            this.$http.post('/user/updateusername', this.newUsername).then(
+              res => {
+                if(res) {
+                  res
+                  this.$message.success('修改成功')
+                  this.reload()
+                }
+              }
+            )
           }
-        )
+        })
       },
       sendSMS() {
         this.$http.post('/user/getsms', {phone: this.userInfo.userPhone}).then(
