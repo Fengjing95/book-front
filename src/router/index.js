@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-15 19:03:15
+ * @LastEditTime: 2020-10-16 19:43:41
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
@@ -98,6 +98,12 @@ const routes = [
     name: 'Dynamic',
     props: (route) => ({ dynamicId: route.params.id }),
     component: () => import('../views/Dynamic'),
+  },
+  {
+    path: '/editor/:id',
+    name: 'Editor',
+    props: (route) => ({ bdId: route.params.id }),
+    component: () => import('../views/Editor'),
   }
 ]
 

@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:03:40
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-09 09:20:17
+ * @LastEditTime: 2020-10-17 19:08:42
  * @FilePath: \book\src\components\LoginDialog.vue
 -->
 <template lang="pug">
@@ -142,7 +142,7 @@ export default {
         // 发送手机号和验证码
         this.$http.post('/user/plogin', pvobj).then(res => {
           if(res) {
-            console.log(res);
+            // console.log(res);
             this.$message({
                 type: "success",
                 message: '登录成功'
@@ -152,7 +152,7 @@ export default {
             // 更新vuex中的状态
             this.$store.commit('freshToken')
             // 登录成功之后关闭对话框
-              console.log(this.$photoHeader + res.data.obj.image);
+              // console.log(this.$photoHeader + res.data.obj.image);
             this.$emit("closeLogin", this.$photoHeader + res.data.obj.image);
           }
         })

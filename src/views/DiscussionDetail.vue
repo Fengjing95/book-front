@@ -2,15 +2,21 @@
  * @Date: 2020-10-13 19:50:51
  * @LastEditors: 小枫
  * @description: 书圈卡片组件
- * @LastEditTime: 2020-10-15 19:36:20
+ * @LastEditTime: 2020-10-17 21:07:59
  * @FilePath: \book\src\views\DiscussionDetail.vue
 -->
 <template lang="pug">
   .discussion-detail(ref="bdScrollView")
     .bread-crumb
-      el-breadcrumb(separator="/")
+      el-breadcrumb(separator="/", style="width: 872px;display: inline-block;")
         el-breadcrumb-item(:to={path: '/discussion'}) 书圈
         el-breadcrumb-item {{bdInfo.bdName}}
+      el-button(
+        type="primary",
+        style="display: inline-block;",
+        :disabled="!isIn",
+        @click="$router.push(`/editor/${bdId}`)"
+      ) 发布动态
     .bd-correlation
       el-avatar(
         :src="bdInfo.bdPhoto",
@@ -35,8 +41,21 @@
           :key="item.id"
           :dynamicObj="item",
         )
+        div(v-if="pageNumber<allPageNumber")
+          el-button(type="text", @click="getDynamicList") 加载更多
+        div(v-else)
+          el-button(type="text", disabled) 已经到底了
       .user
-        p 圈友列表
+        p(style="border-bottom: solid 1px #e6e6e6;line-height: 30px") 圈友列表
+        .user-list(v-if="friendsList.length > 0")
+          .user-item(v-for="(item, index) in friendsList", :key="index")
+            el-tooltip(:content="item.userName", :open-delay=300 )
+              el-avatar(:size=50,:src="$photoHeader+item.userPhoto")
+        p(v-else, style="color: #777;") 快来做第一个圈友吧
+        div(v-if="!isAllFriends")
+          el-button(type="text", @click="showMore") 显示更多
+        div(v-else)
+          el-button(type="text", disabled) 已经显示全部了
 </template>
 
 <script>
@@ -54,41 +73,19 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
         people: 0,
         bdInfo: {},
         isIn: false,
-        dynamicList: [
-          {
-            id: 1,
-            username: '123',
-            date: 1602747419107,
-            content: `掘友们，今天有没有过生日的，没有的话 我过 😂😂 （祝自己生日快乐🎂）
-            历史上，yslow 曾经作为互联网开发的核心指标唯一评价工具，它的指标代表了核心指标。
-            之后逐步出现了 lighthouse 等种种新工具平台和新检测模式。经过几十年发展已经有众多各式各样的性能工具，
-            对应的指标也趋于通用。具体如何评价指标本身的代表性也逐渐成为问题，需要关注。
-            到了 2018 年，Google 在 I/O 大会上提到，75% 的用户认为页面的加载速度，是决定他们交互体验的首要因素[1]。
-            Ire Aderinokun (Google Web Expert) 在 2020 年 #PerfMatter 的分享上说，“一旦页面加载时间超过 5s，
-            用户就有 90% 的可能放弃它。”[2]`
-          },
-          {
-            id: 2,
-            username: '123',
-            date: 1602488184000,
-            content: `掘友们，今天有没有过生日的，没有的话 我过 😂😂 （祝自己生日快乐🎂）
-            历史上，yslow 曾经作为互联网开发的核心指标唯一评价工具，它的指标代表了核心指标。
-            之后逐步出现了 lighthouse 等种种新工具平台和新检测模式。经过几十年发展已经有众多各式各样的性能工具，
-            对应的指标也趋于通用。具体如何评价指标本身的代表性也逐渐成为问题，需要关注。
-            到了 2018 年，Google 在 I/O 大会上提到，75% 的用户认为页面的加载速度，是决定他们交互体验的首要因素[1]。
-            Ire Aderinokun (Google Web Expert) 在 2020 年 #PerfMatter 的分享上说，“一旦页面加载时间超过 5s，
-            用户就有 90% 的可能放弃它。”[2]`
-          },
-          {
-            id: 3,
-            username: '123',
-            date: 1602488184000,
-            content: `123456789`
-          }
-        ]
+        dynamicList: [],
+        isAllFriends: false,
+        friendsList: [],
+        pageNumber: 1,
+        allPageNumber: 1
       }
     },
     methods: {
+      // 展示更多
+      showMore() {
+        this.isAllFriends = true
+        this.getFriendsList()
+      },
       // 获取书圈详情
       getDiscussionDetail() {
         this.$http.get(`/discussions/querybyid?discussionId=${this.bdId}`).then(
@@ -111,6 +108,7 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
               this.people = res.data.obj.num
               this.isIn = res.data.obj.state
               this.$message.success('加入成功')
+              this.getFriendsList()
             }
           }
         )
@@ -129,6 +127,7 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
                 this.people = res.data.obj.num
                 this.isIn = res.data.obj.state
                 this.$message.success('退出成功')
+                this.getFriendsList()
               }
             }
           )
@@ -136,31 +135,50 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
       },
       // 获取圈友列表
       getFriendsList() {
-        this.$http.get(`/bduser/queryuser?bdId=${this.bdId}&limit=0`).then(
+        let limit = 20;
+        if(this.isAllFriends) {
+          limit = 0
+        }
+        this.$http.get(`/bduser/queryuser?bdId=${this.bdId}&limit=${limit}`).then(
           res => {
             if(res) {
-              console.log(res);
+              this.friendsList = res.data.obj
             }
           }
         )
-        
-      }
+      },
+      // 获取动态List
+      getDynamicList() {
+        this.$http.get(`/dynamic/querydynamic?bdId=${this.bdId}&pageNumber=${this.pageNumber}&pageSize=10`).then(
+          res => {
+            if(res) {
+              // console.log(res);
+              this.dynamicList.push(...res.data.obj.content)
+              this.allPageNumber = res.data.obj.totalPages
+              this.pageNumber++
+            }
+          }
+        )
+      },
     },
     created () {
       // 组件创建时获取书圈详情
-      this.getDiscussionDetail()
+      // this.getDiscussionDetail()
       this.bdEnter = true
     },
-    // 未登录不能进入书圈详情，书圈详情需要token
-    beforeRouteEnter: (to, from, next) => {
+    beforeRouteEnter(to, from, next) {
       if (from.name === 'Dynamic') {
         to.meta.isBack = true
       } else {
         to.meta.isBack = false
       }
+      // 需要重新刷新
+      if(to.meta.needReload) {
+        to.meta.isBack = false
+      }
       next()
     },
-    beforeRouteLeave(to,from,next){
+    beforeRouteLeave(to, from, next) {
       //离开页面时把滚动条位置存起来
       this.bdScrollTop = this.$refs.bdScrollView.scrollTop
       this.bdEnter = false
@@ -172,10 +190,13 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
         this.people = 0
         this.bdInfo = {}
         this.isIn = false
-        // this.dynamicList = []
+        this.isAllFriends = false
+        this.dynamicList = []
         this.bdScrollTop = 0
+        this.pageNumber = 1
         this.getDiscussionDetail()
         this.getFriendsList()
+        this.getDynamicList()
       } else {
         // 定位到上次保存的滚动条
         this.$refs.bdScrollView.scrollTop = this.bdScrollTop
@@ -228,6 +249,13 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
       background-color: #ffffff;
       display: inline-block;
       vertical-align:top;
+      .user-list {
+        display: flex;
+        flex-wrap: wrap;
+        .user-item {
+          margin: 10px calc(95px / 8);
+        }
+      }
     }
   }
 }

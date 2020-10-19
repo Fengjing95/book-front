@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-15 15:35:30
+ * @LastEditTime: 2020-10-17 13:08:36
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -11,13 +11,19 @@ import store from './store'
 import './plugins/element.js'
 import axios from 'axios'
 import { Message, Loading } from 'element-ui';
-import md5 from 'md5';
+import md5 from 'md5'
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+
+// 引入编辑器
+Vue.use(mavonEditor)
 
 // md5:密码加密使用
 Vue.prototype.$md5 = md5
 
 // 拼接图片地址
 Vue.prototype.$photoHeader = 'http://192.168.1.137:8080/'
+// Vue.prototype.$photoHeader = 'http://192.168.43.168:8080/'
 
 Vue.config.productionTip = false
 

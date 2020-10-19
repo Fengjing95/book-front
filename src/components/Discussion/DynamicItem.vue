@@ -2,19 +2,19 @@
  * @Date: 2020-10-15 09:22:54
  * @LastEditors: 小枫
  * @description: 动态组件
- * @LastEditTime: 2020-10-15 18:45:21
+ * @LastEditTime: 2020-10-19 09:17:05
  * @FilePath: \book\src\components\Discussion\DynamicItem.vue
 -->
 <template lang="pug">
   div
     .dynamic-item
-      el-avatar.dy-avatar(src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png", :size=50 )
+      el-avatar.dy-avatar(:src="$photoHeader+dynamicObj.user.image", :size=50 )
       .dy-detail(class="clearfix")
-        .nickname {{dynamicObj.username}}
-        .dy-time {{dynamicObj.date | intervalTime}}
-        .overflow(class="dy-content") {{dynamicObj.content}}
+        .nickname {{dynamicObj.user.userName}}
+        .dy-time {{dynamicObj.ddate | intervalTime}}
+        .overflow(class="dy-content") {{dynamicObj.dabstract}}
         .check-detail
-          el-button(type="text",@click="$router.push(`/dynamic/${dynamicObj.id}`)") 查看详情
+          el-button(type="text",@click="$router.push(`/dynamic/${dynamicObj.did}`)") 查看详情
     .footer-btn
       .to-report(@click="toReport")
         i.el-icon-warning-outline 
@@ -22,25 +22,51 @@
       .review(@click="review")
         i.el-icon-chat-dot-round
         .btn-text {{0}}
-      .give-like(:class="{active: isLike}", @click="giveLike")
+      .give-like(:class="{active: isLike}", @click="like")
         i.el-icon-sunny
-        .btn-text {{1}}
+        .btn-text {{likeNum}}
 </template>
 
 <script>
-// TODO：动态组件
+// 动态组件
   export default {
     props: {
       dynamicObj: Object
     },
     data() {
       return {
-        isLike: true
+        // 是否点赞
+        isLike: this.dynamicObj.like,
+        likeNum: this.dynamicObj.likeNum
       }
     },
     methods: {
+      like() {
+        if(this.isLike) {
+          this.cancelLike()
+        } else {
+          this.giveLike()
+        }
+      },
+      cancelLike() {
+        this.$http.get(`/givelike/cancellike?dynamicId=${this.dynamicObj.did}`).then(
+          res => {
+            if(res) {
+              this.isLike = res.data.obj.isLike
+              this.likeNum = res.data.obj.likeNum
+            }
+          }
+        )
+      },
       giveLike() {
-        console.log('give like');
+        this.$http.get(`/givelike/givelike?dynamicId=${this.dynamicObj.did}`).then(
+          res => {
+            if(res) {
+              this.isLike = res.data.obj.isLike
+              this.likeNum = res.data.obj.likeNum
+            }
+          }
+        )
       },
       toReport() {
         console.log('to report');
@@ -75,7 +101,7 @@
       color: #777;
     }
     .dy-content {
-      height: 100px;
+      height: 70px;
       overflow: hidden;
     }
     .check-detail {
@@ -106,14 +132,23 @@
   }
   .to-report {
     flex: 1;
+    &:hover {
+      color: #409eff;
+    }
   }
   .review {
     flex: 1;
     border-left: solid 1px #c9c9c9;
     border-right: solid 1px #c9c9c9;
+    &:hover {
+      color: #409eff;
+    }
   }
   .give-like {
     flex: 1;
+    &:hover {
+      color: #409eff;
+    }
   }
   .active {
     color: #409eff;
