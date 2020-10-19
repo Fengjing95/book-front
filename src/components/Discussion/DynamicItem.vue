@@ -2,7 +2,7 @@
  * @Date: 2020-10-15 09:22:54
  * @LastEditors: 小枫
  * @description: 动态组件
- * @LastEditTime: 2020-10-19 09:17:05
+ * @LastEditTime: 2020-10-19 20:26:16
  * @FilePath: \book\src\components\Discussion\DynamicItem.vue
 -->
 <template lang="pug">
@@ -21,7 +21,7 @@
         .btn-text 举报
       .review(@click="review")
         i.el-icon-chat-dot-round
-        .btn-text {{0}}
+        .btn-text {{reviewNum}}
       .give-like(:class="{active: isLike}", @click="like")
         i.el-icon-sunny
         .btn-text {{likeNum}}
@@ -37,7 +37,8 @@
       return {
         // 是否点赞
         isLike: this.dynamicObj.like,
-        likeNum: this.dynamicObj.likeNum
+        likeNum: this.dynamicObj.likeNum,
+        reviewNum: this.dynamicObj.reviewsNum
       }
     },
     methods: {
@@ -72,7 +73,16 @@
         console.log('to report');
       },
       review() {
-        console.log('review');
+        // TODO发布评论
+        this.$prompt('请输入评论内容', '评论', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: /[\s\S]{1,255}/,
+          inputErrorMessage: '字数限制1-255'
+        }).then(({ value }) => {
+          console.log(value);
+          
+        }).catch(() => {})
       }
     },
   }
