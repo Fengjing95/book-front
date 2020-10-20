@@ -2,7 +2,7 @@
  * @Date: 2020-10-15 09:22:54
  * @LastEditors: 小枫
  * @description: 动态组件
- * @LastEditTime: 2020-10-19 20:26:16
+ * @LastEditTime: 2020-10-20 12:17:01
  * @FilePath: \book\src\components\Discussion\DynamicItem.vue
 -->
 <template lang="pug">
@@ -73,15 +73,25 @@
         console.log('to report');
       },
       review() {
-        // TODO发布评论
+        // 发布评论
         this.$prompt('请输入评论内容', '评论', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           inputPattern: /[\s\S]{1,255}/,
           inputErrorMessage: '字数限制1-255'
         }).then(({ value }) => {
-          console.log(value);
-          
+          const sendReviewObj = {
+            reviewContent: value,
+            dynamicId: this.dynamicObj.did,
+          }
+          this.$http.post('/dynamicreview/releasereview', sendReviewObj).then(
+            res => {
+              if(res) {
+                this.reviewNum++
+                this.$message.success('评论成功')
+              }
+            }
+          )
         }).catch(() => {})
       }
     },

@@ -2,10 +2,9 @@
  * @Date: 2020-10-15 18:42:21
  * @LastEditors: 小枫
  * @description: 动态详情
- * @LastEditTime: 2020-10-19 21:14:39
+ * @LastEditTime: 2020-10-20 15:48:41
  * @FilePath: \book\src\views\Dynamic.vue
 -->
-// TODO 发布评论
 <template lang="pug">
   .dynamic
     .dynamic-info-bread
@@ -33,22 +32,24 @@
         el-avatar(
           shape="square",
           :size=50,
-          :src="photo"
+          :src="photo",
         )
         el-input(
           v-model="reviewContent",
           type="textarea",
           :rows="2",
           placeholder="快来发表你的看法吧",
-          style="margin: 0 20px;"
+          style="flex: 1;margin: 0 20px;"
         )
         el-button(
           type="primary",
+          :disabled="reviewContent.length===0",
+          @click="sendReview",
         ) 发布
           br
           span 评论
       .count-pagination
-        h3 {{dynamic.reviewsNum}} 评论
+        h3 {{reviewCount}} 评论
         el-pagination.page(
           small,
           layout="prev, pager, next",
@@ -60,6 +61,9 @@
         v-for="item in review",
         :key="item.drId",
         :reviewObj="item",
+        @refreshReview="getReviewList",
+        :myId="myId",
+        :isMine="isMine"
       )
         div(v-if="item.sonReview.length !== 0")
           my-review(
@@ -67,6 +71,9 @@
             :key="item2.drId",
             :reviewObj="item2",
             style="background-color: #fafbfc;",
+            @refreshReview="getReviewList",
+            :myId="myId",
+            :isMine="isMine"
           )
       el-pagination.pagination(
         background,
@@ -79,7 +86,6 @@
 </template>
 
 <script>
-// TODO：评论
 import MyReview from '../components/MyReview.vue'
   export default {
     props: {
@@ -95,11 +101,13 @@ import MyReview from '../components/MyReview.vue'
         bdId: '',
         user:'',
         isMine: false,
+        myId: null,
         needReload: false,
         review: [],
         reviewPageNum: 1,
         allReviewPageNum: null,
-        reviewContent: ''
+        reviewContent: '',
+        reviewCount: null
       }
     },
     computed: {
@@ -125,6 +133,7 @@ import MyReview from '../components/MyReview.vue'
               this.user = res.data.obj.dynamic.user
               this.user.image = this.$photoHeader+this.user.image
               this.isMine = res.data.obj.my
+              this.myId = res.data.obj.nowUser
               return res.data.obj.dynamic.bdId
             }
           }
@@ -190,13 +199,29 @@ import MyReview from '../components/MyReview.vue'
               // console.log(res);
               this.review = res.data.obj.content
               this.allReviewPageNum = res.data.obj.totalPages
+              this.reviewCount = res.data.obj.totalSize
             }
           }
         )
       },
       currentPageChange(val) {
         this.reviewPageNum = val
-      }
+      },
+      sendReview() {
+        const sendReviewObj = {
+          reviewContent: this.reviewContent,
+          dynamicId: this.dynamicId,
+        }
+        this.$http.post('/dynamicreview/releasereview', sendReviewObj).then(
+          res => {
+            if(res) {
+              this.reviewContent = ''
+              this.reviewPageNum = 1
+              this.getReviewList()
+            }
+          }
+        )
+      },
     },
     // 离开前设置是否需要刷新
     beforeRouteLeave (to, from, next) {
