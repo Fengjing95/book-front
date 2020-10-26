@@ -2,7 +2,7 @@
  * @Date: 2020-10-18 15:22:31
  * @LastEditors: 小枫
  * @description: 评论组件
- * @LastEditTime: 2020-10-20 15:33:31
+ * @LastEditTime: 2020-10-26 16:36:21
  * @FilePath: \book\src\components\MyReview.vue
 -->
 <template lang="pug">
@@ -22,13 +22,13 @@
         span {{reviewObj.repUserPojo ? reviewObj.repUserPojo.userName : '原评论已删除'}}:
       .content
         .content-text {{reviewObj.drContent}}
-        el-button.content-btn(type="text", @click="showForm") 回复
+        el-button.content-btn(type="text", @click="showForm", :disabled="isBanned") 回复
       .review-input(v-if="isShowForm", @mousedown.prevent)
         el-input(
           ref="reviewInput",
           @blur="hiddenForm",
           v-model="content",
-          :placeholder='`回复@${reviewObj.userPojo.userName}`'
+          :placeholder='`回复@${reviewObj.userPojo.userName}`',
           @mousedown.stop
         )
         el-button.reply-btn(
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import Message from '../assets/js/Message'
   export default {
     props: {
       reviewObj: Object,
@@ -52,6 +53,7 @@
         type: Number,
         default: 0,
       },
+      isBanned: Boolean
     },
     data() {
       return {
@@ -84,13 +86,24 @@
         this.$http.post('/dynamicreview/releasereview', sendReviewObj).then(
           res => {
             if(res) {
-              this.content = ''
-              this.btnText = '回复'
-              this.$refs.reviewInput.blur()
-              this.$emit('refreshReview')
+              if(this.myId !== this.reviewObj.userId) {
+                const message = new Message()
+                message.targetId = this.reviewObj.userId
+                message.msg = sendReviewObj.reviewContent
+                message.token = this.$store.getters.getToken
+                message.dynamicId = this.reviewObj.dynamicId
+                this.$socket.emit('send_review', message)
+              }
             }
           }
-        )
+        ).finally(() => {
+          this.content = ''
+          this.btnText = '回复'
+          this.$nextTick(() => {
+            this.$refs.reviewInput.blur()
+          })
+          this.$emit('refreshReview')
+        })
       },
       deleteReview() {
         this.$http.get(`/dynamicreview/deletereview?dId=${this.reviewObj.dynamicId}&reviewId=${this.reviewObj.drId}`).then(

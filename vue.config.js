@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-26 10:26:26
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-16 10:07:35
+ * @LastEditTime: 2020-10-25 16:28:10
  * @FilePath: \book\vue.config.js
  */
 module.exports = {
@@ -12,9 +12,9 @@ module.exports = {
     disableHostCheck: true, // 允许转发
     "proxy": {
       "/api": {
-        "target": "http://192.168.1.137:8080/api", //代理地址
+        "target": "http://192.168.1.162:8080/api", //代理地址
         // "target": "http://192.168.43.168:8080/api", //代理地址
-        "ws": true,
+        "ws": false,
         "changeOrigin": true,
         "pathRewrite": {
           "^/api": ""

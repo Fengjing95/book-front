@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-16 19:43:41
+ * @LastEditTime: 2020-10-22 12:10:56
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
@@ -104,6 +104,11 @@ const routes = [
     name: 'Editor',
     props: (route) => ({ bdId: route.params.id }),
     component: () => import('../views/Editor'),
+  },
+  // 未命中显示404
+  {
+    path: '*',
+    component: () => import('../views/404')
   }
 ]
 

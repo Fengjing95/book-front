@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-15 13:22:53
+ * @LastEditTime: 2020-10-25 09:40:51
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -21,20 +21,34 @@
       :index="item.route"
     ) {{ item.name }}
 
-    el-dropdown.list(
+    el-badge.list(
+      :is-dot="getMessage.length!==0",
+      class="item",
       v-if="getToken",
-      trigger="click",
-      @command="handleCommand"
     )
-      el-avatar(class="avatar", :src="userPhoto")
-      el-dropdown-menu(slot="dropdown")
-        el-dropdown-item(
-          v-for="item in list",
-          :key="item.command",
-          :icon="item.icon",
-          :command="item.command"
-        ) {{item.name}}
-    //- .list(v-else)
+      el-dropdown(
+        trigger="click",
+        @command="handleCommand"
+      )
+        el-avatar(class="avatar", :src="userPhoto")
+        el-dropdown-menu(slot="dropdown")
+          el-dropdown-item(
+            icon="el-icon-bell",
+            command="message"
+          ) 消息通知
+            el-badge(
+              v-show="getMessage.length!==0",
+              class="mark",
+              :value="getMessage.length",
+              :max="99"
+            )
+          el-dropdown-item(
+            v-for="item in list",
+            :key="item.command",
+            :icon="item.icon",
+            :command="item.command"
+          ) {{item.name}}
+      //- .list(v-else)
     .btn(v-else)
       el-button(type="primary", @click="changeLoginDialogStauts") 登录
     .search-box
@@ -73,7 +87,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getToken']),  // store中获取token
+    ...mapGetters(['getToken', 'getMessage']),  // store中获取token
     // 绑定路由和菜单栏选中项
     route() {
       return "/" + this.$route.path.replace("/", "")
@@ -109,10 +123,16 @@ export default {
           break;
         case 'personal':
           this.$router.push('/personal')
-          break
+          break;
         case 'attendance':
           this.changeAttendanceDialogStatus()
-          break
+          break;
+        case 'message':
+          this.$router.push('/message')
+          // this.$store.commit('readAllMsg')
+          break;
+        default:
+          break;
       }
     },
     // 获取用户信息，提取头像地址

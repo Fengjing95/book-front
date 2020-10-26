@@ -2,7 +2,7 @@
  * @Date: 2020-10-12 09:59:58
  * @LastEditors: 小枫
  * @description: 书圈列表页面
- * @LastEditTime: 2020-10-15 19:32:42
+ * @LastEditTime: 2020-10-22 09:49:50
  * @FilePath: \book\src\views\Discussion.vue
 -->
 <template lang="pug">
@@ -74,6 +74,10 @@ import DiscussionItem from '../components/Discussion/DiscussionItem.vue';
     created () {
       // 组件创建时标记为创建，防止详情界面刷新数据丢失无法刷新
       this.isEnter = true
+      // 提示查看详情需要登录
+      if(!this.$store.getters.getToken) {
+        this.$message.info('查看书圈需要先登录哦')
+      }
     },
     // 导航守卫：如果是从书圈详情返回回来的设置isBack为true
     beforeRouteEnter(to, from, next) {

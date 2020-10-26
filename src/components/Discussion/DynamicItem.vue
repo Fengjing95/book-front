@@ -2,7 +2,7 @@
  * @Date: 2020-10-15 09:22:54
  * @LastEditors: 小枫
  * @description: 动态组件
- * @LastEditTime: 2020-10-20 12:17:01
+ * @LastEditTime: 2020-10-26 16:39:02
  * @FilePath: \book\src\components\Discussion\DynamicItem.vue
 -->
 <template lang="pug">
@@ -29,9 +29,12 @@
 
 <script>
 // 动态组件
+import Message from '../../assets/js/Message'
   export default {
     props: {
-      dynamicObj: Object
+      dynamicObj: Object,
+      isBanned: Boolean,
+      myId: Number
     },
     data() {
       return {
@@ -65,35 +68,55 @@
             if(res) {
               this.isLike = res.data.obj.isLike
               this.likeNum = res.data.obj.likeNum
+              if(this.myId !== this.dynamicObj.userId) {
+                const message = new Message()
+                message.targetId = this.dynamicObj.userId
+                message.dynamicId = this.dynamicObj.did
+                message.token = this.$store.getters.getToken
+                this.$socket.emit('send_like', message)
+              }
             }
           }
         )
       },
+      // TODO: 举报
       toReport() {
         console.log('to report');
       },
       review() {
         // 发布评论
-        this.$prompt('请输入评论内容', '评论', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          inputPattern: /[\s\S]{1,255}/,
-          inputErrorMessage: '字数限制1-255'
-        }).then(({ value }) => {
-          const sendReviewObj = {
-            reviewContent: value,
-            dynamicId: this.dynamicObj.did,
-          }
-          this.$http.post('/dynamicreview/releasereview', sendReviewObj).then(
-            res => {
-              if(res) {
-                this.reviewNum++
-                this.$message.success('评论成功')
-              }
+        if(!this.isBanned) {
+          this.$prompt('请输入评论内容', '评论', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            inputPattern: /[\s\S]{1,255}/,
+            inputErrorMessage: '字数限制1-255'
+          }).then(({ value }) => {
+            const sendReviewObj = {
+              reviewContent: value,
+              dynamicId: this.dynamicObj.did,
             }
-          )
-        }).catch(() => {})
-      }
+            this.$http.post('/dynamicreview/releasereview', sendReviewObj).then(
+              res => {
+                if(res) {
+                  this.reviewNum++
+                  if(this.myId !== this.dynamicObj.userId) {
+                    const message = new Message()
+                    message.targetId = this.dynamicObj.userId
+                    message.msg = sendReviewObj.reviewContent
+                    message.dynamicId = sendReviewObj.dynamicId
+                    message.token = this.$store.getters.getToken
+                    this.$socket.emit('send_review', message)
+                  }
+                  this.$message.success('评论成功')
+                }
+              }
+            )
+          }).catch(() => {})
+        } else {
+          this.$message.error('禁言期无法发布评论')
+        }
+      },
     },
   }
 </script>

@@ -2,7 +2,7 @@
  * @Date: 2020-10-13 19:50:51
  * @LastEditors: 小枫
  * @description: 书圈卡片组件
- * @LastEditTime: 2020-10-17 21:07:59
+ * @LastEditTime: 2020-10-26 11:10:20
  * @FilePath: \book\src\views\DiscussionDetail.vue
 -->
 <template lang="pug">
@@ -14,7 +14,7 @@
       el-button(
         type="primary",
         style="display: inline-block;",
-        :disabled="!isIn",
+        :disabled="!isIn || isBanned",
         @click="$router.push(`/editor/${bdId}`)"
       ) 发布动态
     .bd-correlation
@@ -40,6 +40,8 @@
           v-for="item in dynamicList",
           :key="item.id"
           :dynamicObj="item",
+          :isBanned="isBanned",
+          :myId="myId"
         )
         div(v-if="pageNumber<allPageNumber")
           el-button(type="text", @click="getDynamicList") 加载更多
@@ -77,7 +79,9 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
         isAllFriends: false,
         friendsList: [],
         pageNumber: 1,
-        allPageNumber: 1
+        allPageNumber: 1,
+        isBanned: false,
+        myId: null,
       }
     },
     methods: {
@@ -94,7 +98,9 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
               this.bdInfo = res.data.obj.obj
               this.people = res.data.obj.num
               this.isIn = res.data.obj.state
+              this.isBanned = res.data.obj.isBanned
               // console.log(res);
+              this.myId = res.data.obj.myId
               this.bdInfo.bdPhoto = this.$photoHeader+this.bdInfo.bdPhoto
             }
           }

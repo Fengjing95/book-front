@@ -2,7 +2,7 @@
  * @Date: 2020-10-15 18:42:21
  * @LastEditors: 小枫
  * @description: 动态详情
- * @LastEditTime: 2020-10-20 15:48:41
+ * @LastEditTime: 2020-10-26 16:33:24
  * @FilePath: \book\src\views\Dynamic.vue
 -->
 <template lang="pug">
@@ -15,7 +15,7 @@
       .like-icon(:class="{active: dynamic.like}", @click="like")
         i.el-icon-sunny
         .btn-text {{dynamic.likeNum}}
-    .dynamic-info-user
+    .dynamic-info-user(v-show="lineSuccess")
       el-avatar.dynamic-info-user-avatar(:src="user.image", :size=50 )
       .name-and-date
         .dynamic-info-user-name {{user.userName}}
@@ -39,7 +39,8 @@
           type="textarea",
           :rows="2",
           placeholder="快来发表你的看法吧",
-          style="flex: 1;margin: 0 20px;"
+          style="flex: 1;margin: 0 20px;",
+          :disabled="isBanned"
         )
         el-button(
           type="primary",
@@ -63,7 +64,8 @@
         :reviewObj="item",
         @refreshReview="getReviewList",
         :myId="myId",
-        :isMine="isMine"
+        :isMine="isMine",
+        :isBanned="isBanned"
       )
         div(v-if="item.sonReview.length !== 0")
           my-review(
@@ -73,7 +75,8 @@
             style="background-color: #fafbfc;",
             @refreshReview="getReviewList",
             :myId="myId",
-            :isMine="isMine"
+            :isMine="isMine",
+            :isBanned="isBanned"
           )
       el-pagination.pagination(
         background,
@@ -87,6 +90,7 @@
 
 <script>
 import MyReview from '../components/MyReview.vue'
+import Message from '../assets/js/Message'
   export default {
     props: {
       dynamicId: String
@@ -96,7 +100,9 @@ import MyReview from '../components/MyReview.vue'
     },
     data() {
       return {
-        dynamic: {},
+        dynamic: {
+          dcontent: `<img src="//s3.pstatp.com/toutiao/xitu_juejin_web/img/article-loading.fca922e.png"></img>`
+        },
         bdName: '',
         bdId: '',
         user:'',
@@ -107,7 +113,9 @@ import MyReview from '../components/MyReview.vue'
         reviewPageNum: 1,
         allReviewPageNum: null,
         reviewContent: '',
-        reviewCount: null
+        reviewCount: null,
+        lineSuccess: false,
+        isBanned: false
       }
     },
     computed: {
@@ -129,11 +137,13 @@ import MyReview from '../components/MyReview.vue'
           res => {
             if(res) {
               // console.log(res);
+              this.lineSuccess = true
               this.dynamic = res.data.obj.dynamic
               this.user = res.data.obj.dynamic.user
               this.user.image = this.$photoHeader+this.user.image
               this.isMine = res.data.obj.my
               this.myId = res.data.obj.nowUser
+              this.isBanned = res.data.obj.isBanned
               return res.data.obj.dynamic.bdId
             }
           }
@@ -188,6 +198,13 @@ import MyReview from '../components/MyReview.vue'
             if(res) {
               this.dynamic.like = res.data.obj.isLike
               this.dynamic.likeNum = res.data.obj.likeNum
+              if(this.user.userId !== this.myId) {
+                const message = new Message()
+                message.targetId = this.user.userId
+                message.token = this.$store.getters.getToken
+                message.dynamicId = this.dynamicId
+                this.$socket.emit('send_like', message)
+              }
             }
           }
         )
@@ -217,6 +234,15 @@ import MyReview from '../components/MyReview.vue'
             if(res) {
               this.reviewContent = ''
               this.reviewPageNum = 1
+              // 发送通知
+              if(this.user.userId !== this.myId) {
+                const message = new Message()
+                message.targetId = this.user.userId
+                message.msg = sendReviewObj.reviewContent
+                message.dynamicId = this.dynamicId
+                message.token = this.$store.getters.getToken
+                this.$socket.emit('send_review', message)
+              }
               this.getReviewList()
             }
           }

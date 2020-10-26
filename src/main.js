@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-17 13:08:36
+ * @LastEditTime: 2020-10-26 10:37:29
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -10,10 +10,30 @@ import router from './router'
 import store from './store'
 import './plugins/element.js'
 import axios from 'axios'
-import { Message, Loading } from 'element-ui';
+import { Loading, Notification } from 'element-ui'
+import {message as Message} from './plugins/resetMessage'
 import md5 from 'md5'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
+import VueSocketIO from 'vue-socket.io'
+import socket from 'socket.io-client';
+
+const url = 'http://192.168.1.162:8080/'
+// Socket
+Vue.use(
+  new VueSocketIO({
+    debug: true,
+    connection: socket(`http://192.168.1.162:8081`, {
+      path: '',
+      transports: ['websocket', 'xhr-polling', 'jsonp-polling']
+    }),
+    vuex: {
+      store,
+      mutationPrefix: "SOCKET_",
+      actionPrefix: ""
+    },
+  })
+)
 
 // 引入编辑器
 Vue.use(mavonEditor)
@@ -22,15 +42,13 @@ Vue.use(mavonEditor)
 Vue.prototype.$md5 = md5
 
 // 拼接图片地址
-Vue.prototype.$photoHeader = 'http://192.168.1.137:8080/'
-// Vue.prototype.$photoHeader = 'http://192.168.43.168:8080/'
+Vue.prototype.$photoHeader = url
 
 Vue.config.productionTip = false
 
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-axios.defaults.withCredentials = true // 跨域
-axios.defaults.baseURL = '/api' // baseUrl:方便修改http地址
-
+axios.defaults.withCredentials = false // 跨域
+axios.defaults.baseURL = process.env.NODE_ENV === "development" ? "/api" : url + 'api' // baseUrl:方便修改http地址
 
 // http request 请求拦截器
 let loading
@@ -68,17 +86,40 @@ axios.interceptors.response.use(response => {
       case 403:
         Message({
           type: 'error',
-          message: 'token过期或被篡改请重新登陆'
+          message: '令牌过期或被非法修改请重新登陆'
         });
         window.localStorage.clear()
         store.commit('freshToken')
         router.push('/')
         break;
+      case 412:
+        Notification.error({
+          title: '错误',
+          message: '参数错误'
+        })
+        break;
+      case 414:
+        Message.error({
+          title: '错误',
+          message: '请先登录'
+        })
+        break;
+      case 413:
+        Message.error({
+          title: '错误',
+          message: '异地登录，如果发生密码泄漏请尽快修改'
+        })
+        window.localStorage.clear()
+        store.commit('freshToken')
+        router.push('/')
+        break;
       default:
-        Message({
-          type: 'error',
-          message: error.response.data.msg
-        });
+        if (error.response.data.msg) {
+          Message({
+            type: 'error',
+            message: error.response.data.msg
+          });
+        }
         break;
     }
   } else { // 没有获取响应
@@ -88,6 +129,7 @@ axios.interceptors.response.use(response => {
     });
   }
 })
+// TODO 500跳转页面
 
 // 绑定axios到Vue原型
 Vue.prototype.$http = axios

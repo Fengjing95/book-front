@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-14 13:54:01
+ * @LastEditTime: 2020-10-26 15:36:38
  * @FilePath: \book\src\App.vue
 -->
 <template lang="pug">
@@ -34,6 +34,8 @@
 import NavBar from './components/NavBar.vue'
 import loginDialog from './components/LoginDialog.vue'
 import DailyAttendance from './components/Attendance/DailyAttendance.vue'
+import Message from './assets/js/Message';
+// import { mapGetters } from 'vuex'
 export default {
   provide() {
     return {
@@ -82,10 +84,57 @@ export default {
     },
     displayAttendance() {
       this.$refs.attendanceRef.displayAttDialog()
+    },
+    // 上线或重新登陆获取消息
+    getMessage() {
+      this.$http.get(`/msg/querymsg?pageNumber=1&pageSize=100`).then(
+        res => {
+          if(res) {
+            // console.log(res);
+            this.$store.commit('addMessage', res.data.obj.content)
+          }
+        }
+      )
+    }
+  },
+  computed: {
+    // ...mapGetters['getToken']
+    tn() {
+      return this.$store.getters.getToken
+    }
+  },
+  watch: {
+    tn(newVal) {
+      if(newVal !== null) {
+        this.$socket.emit('set_info', {msg: newVal})
+        this.getMessage()
+      }
     }
   },
   created() {
+    console.log('%cstop!','color: red;font-size: 40px;font-weight:700;text-shadow:2px 2px 0px #000');
+    console.log('我们不建议您使用开发者工具进行任何操作，除非您具有一定的技能，否则出现任何后果我们将不予承担！！！');
+    console.log('%c书源%c已打开',
+      'background-color: #6efd12;color: #fff;padding: 3px 2px 3px 5px;border-radius: 5px 0 0 5px;',
+      'background-color: #000000;color: #fff;padding: 3px 5px 3px 2px;border-radius: 0 5px 5px 0;');
+    const mode = process.env.NODE_ENV ==='development' ? '开发' : '生产'
+    console.log(`%c${mode}%c模式`,
+      'background-color: #409eff;color: #fff;padding: 3px 2px 3px 5px;border-radius: 5px 0 0 5px;',
+      'background-color: #000000;color: #fff;padding: 3px 5px 3px 2px;border-radius: 0 5px 5px 0;');
     this.freshPhotoUrl()
+  },
+  sockets: {
+    connect() {
+      console.log('%csocket%c已连接',
+        'background-color: #db310d;color: #fff;padding: 3px 2px 3px 5px;border-radius: 5px 0 0 5px;',
+        'background-color: #000000;color: #fff;padding: 3px 5px 3px 2px;border-radius: 0 5px 5px 0;');
+      if(localStorage.getItem('token')) {
+        const message = new Message()
+        message.msg = localStorage.getItem('token')
+        this.$socket.emit('set_info', message)
+        this.getMessage()
+      }
+    },
   }
 }
 </script>
