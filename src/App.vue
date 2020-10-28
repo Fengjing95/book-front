@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-26 15:36:38
+ * @LastEditTime: 2020-10-28 19:14:39
  * @FilePath: \book\src\App.vue
 -->
 <template lang="pug">
@@ -23,6 +23,12 @@
       login-dialog(@closeLogin="closeLoginDialog")
       //- login-dialog/
     daily-attendance(ref="attendanceRef")/
+    audio(
+      controls="controls",
+      hidden,
+      src="./assets/mp3/message.mp3",
+      ref="audio"
+    )
     el-backtop/
     keep-alive
       router-view(v-if="isRouterAlive && $route.meta.keepAlive")/
@@ -95,6 +101,17 @@ export default {
           }
         }
       )
+    },
+    // 上线获取公告
+    getNotice() {
+      this.$http.get('/notice/user/querynotice?pageNumber=1&pageSize=100').then(
+        res => {
+          if(res) {
+            // console.log(res);
+            this.$store.commit('getNotice', res.data.obj.content)
+          }
+        }
+      )
     }
   },
   computed: {
@@ -108,6 +125,7 @@ export default {
       if(newVal !== null) {
         this.$socket.emit('set_info', {msg: newVal})
         this.getMessage()
+        this.getNotice()
       }
     }
   },
@@ -133,8 +151,21 @@ export default {
         message.msg = localStorage.getItem('token')
         this.$socket.emit('set_info', message)
         this.getMessage()
+        this.getNotice()
       }
     },
+    LIKE() {
+      this.$refs.audio.currentTime = 0; //从头开始播放提示音
+      this.$refs.audio.play(); //播放
+    },
+    REVIEW() {
+      this.$refs.audio.currentTime = 0; //从头开始播放提示音
+      this.$refs.audio.play(); //播放
+    },
+    NOTICE() {
+      this.$refs.audio.currentTime = 0; //从头开始播放提示音
+      this.$refs.audio.play(); //播放
+    }
   }
 }
 </script>

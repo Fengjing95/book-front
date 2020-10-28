@@ -2,7 +2,7 @@
  * @Date: 2020-10-15 09:22:54
  * @LastEditors: 小枫
  * @description: 动态组件
- * @LastEditTime: 2020-10-26 16:39:02
+ * @LastEditTime: 2020-10-28 20:58:57
  * @FilePath: \book\src\components\Discussion\DynamicItem.vue
 -->
 <template lang="pug">
@@ -25,6 +25,13 @@
       .give-like(:class="{active: isLike}", @click="like")
         i.el-icon-sunny
         .btn-text {{likeNum}}
+
+    //- el-dialog(
+    //-   :visible.sync="reportVisiable",
+    //-   title="举报动态",
+    //-   width="30%"
+    //- )
+    //-   el-in
 </template>
 
 <script>
@@ -41,7 +48,8 @@ import Message from '../../assets/js/Message'
         // 是否点赞
         isLike: this.dynamicObj.like,
         likeNum: this.dynamicObj.likeNum,
-        reviewNum: this.dynamicObj.reviewsNum
+        reviewNum: this.dynamicObj.reviewsNum,
+        // reportVisiable: false
       }
     },
     methods: {
@@ -81,7 +89,32 @@ import Message from '../../assets/js/Message'
       },
       // TODO: 举报
       toReport() {
-        console.log('to report');
+        this.$prompt('请输入描述信息（必填）', '举报', {
+          confirmButtonText: '坚决举报',
+          cancelButtonText: '算了',
+          inputPattern: /[\s\S]{1,255}/,
+          inputErrorMessage: '字数限制1-255',
+          // closeOnClickModal: true
+        }).then(({ value }) => {
+          const reportObj = {
+            reportDes: value,
+            targetId: this.dynamicObj.did,
+            reportType: 1
+          }
+          // TODO：修改举报链接
+          this.$http.post('/dynamicreview/releasereview', reportObj).then(
+            res => {
+              if(res) {
+                this.reviewNum++
+                if(this.myId !== this.dynamicObj.userId) {
+                  // TODO：发送举报socket
+                  this.$socket.emit('send_report')
+                }
+                this.$message.success('提交成功，处理结果将尽快反馈给您')
+              }
+            }
+          )
+        }).catch(() => {})
       },
       review() {
         // 发布评论
