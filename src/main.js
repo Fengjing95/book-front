@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-26 10:37:29
+ * @LastEditTime: 2020-10-30 10:40:47
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -19,10 +19,12 @@ import VueSocketIO from 'vue-socket.io'
 import socket from 'socket.io-client';
 
 const url = 'http://192.168.1.162:8080/'
+// const url = 'http://192.168.43.168:8080/'
 // Socket
 Vue.use(
   new VueSocketIO({
     debug: true,
+    // connection: socket(`http://192.168.43.168:8081`, {
     connection: socket(`http://192.168.1.162:8081`, {
       path: '',
       transports: ['websocket', 'xhr-polling', 'jsonp-polling']

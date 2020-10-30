@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-26 10:26:26
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-25 16:28:10
+ * @LastEditTime: 2020-10-30 10:40:38
  * @FilePath: \book\vue.config.js
  */
 module.exports = {

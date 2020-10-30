@@ -2,7 +2,7 @@
  * @Date: 2020-10-26 18:59:54
  * @LastEditors: 小枫
  * @description: 消息中心
- * @LastEditTime: 2020-10-28 17:19:21
+ * @LastEditTime: 2020-10-29 21:46:36
  * @FilePath: \book\src\views\MessageCenter.vue
 -->
 <template lang="pug">
@@ -36,14 +36,24 @@
           el-collapse-item(
             v-for="(item, index) in $store.getters.readNotice",
             :key="index",
-            :name="item.noticeId"
+            :name="item.noticeId",
           )
             template(slot="title")
               .date(style="margin-right: 10px; color: #d2d2d2;") {{item.noticeDate | intervalTime}}
               .notice-title(style="line-height: 16px;padding-right: 15px;color: #83c0ff") {{item.noticeTitle}}
                 el-badge.item(value="new" v-show="!item.read")
-            .nums(style="color: #d2d2d2;") 已有{{item.nums}}人读过
-            .markdown-body(v-html="item.noticeContent")
+            div(style="background-color: #fdfcf0;padding: 10px;border-radius: 5px;")
+              .nums(style="color: #d2d2d2;") {{item.nums ? '已有'+item.nums+'人读过':''}}
+              .markdown-body(v-html="item.noticeContent")
+      el-tab-pane
+        span.title(slot="label")
+          el-badge(:is-dot="$store.getters.getSystem.length !== 0")
+            i.el-icon-s-check  系统
+        message-item(
+          v-for="(item, index) in readSystem",
+          :key="index",
+          :messageObj="item"
+        )/
 </template>
 
 <script>
@@ -60,7 +70,7 @@ import MessageItem from '../components/Message/MessageItem'
       }
     },
     computed: {
-      ...mapGetters(['readMessage']),
+      ...mapGetters(['readMessage', 'readSystem']),
       isBottom() {
         return this.$store.getters.readMessage.length < 100 || this.msgPageNumber === this.msgAllPageNumber
       }

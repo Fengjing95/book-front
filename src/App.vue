@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-28 19:14:39
+ * @LastEditTime: 2020-10-30 14:51:34
  * @FilePath: \book\src\App.vue
 -->
 <template lang="pug">
@@ -112,6 +112,17 @@ export default {
           }
         }
       )
+    },
+    // 上线获取系统通知
+    getSystem() {
+      this.$http.get('/msg/querysystem?pageNumber=1&pageSize=100').then(
+        res => {
+          if(res) {
+            console.log(res);
+            this.$store.commit('addSystem', res.data.obj.content)
+          }
+        }
+      )
     }
   },
   computed: {
@@ -126,6 +137,7 @@ export default {
         this.$socket.emit('set_info', {msg: newVal})
         this.getMessage()
         this.getNotice()
+        this.getSystem()
       }
     }
   },
@@ -152,6 +164,7 @@ export default {
         this.$socket.emit('set_info', message)
         this.getMessage()
         this.getNotice()
+        this.getSystem()
       }
     },
     LIKE() {

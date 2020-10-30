@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:26
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-28 19:07:08
+ * @LastEditTime: 2020-10-30 14:47:32
  * @FilePath: \book\src\store\index.js
  */
 import Vue from 'vue'
@@ -14,7 +14,8 @@ export default new Vuex.Store({
   state: {
     token: window.localStorage.getItem('token'),
     message: [],
-    notice: []
+    notice: [],
+    system: []
   },
   mutations: {
     freshToken(state) {
@@ -22,6 +23,33 @@ export default new Vuex.Store({
     },
     addMessage(state, newMsg) {
       state.message = [...newMsg]
+    },
+    addSystem(state, system) {
+      state.system = [...system]
+    },
+    addSystemByHttp(state, system) {
+      const last = state.system[state.system.length - 1].msgId
+      let flag = 0
+      for (let i = 0; i < system.length; i++) {
+        if (system[i].msgId === last) {
+          flag = i
+          break
+        }
+      }
+      const newSystem = system.slice(flag)
+      state.system.push(...newSystem)
+    },
+    setOneSystemRead(state, systemId) {
+      try {
+        state.system.forEach(item => {
+          if (item.msgId === systemId) {
+            item.read = true
+            throw new Error('结束')
+          }
+        })
+      } catch (error) {
+        error
+      }
     },
     addMsgByHttp(state, msgs) {
       const last = state.message[state.message.length - 1].msgId
@@ -80,6 +108,10 @@ export default new Vuex.Store({
     SOCKET_LIKE(state, msg) {
       state.message.unshift(msg)
       Notification.success('收到一条点赞消息')
+    },
+    SOCKET_SYSTEM(state, system) {
+      state.system.unshift(system)
+      Notification.success('收到一条系统通知')
     }
   },
   actions: {
@@ -103,6 +135,14 @@ export default new Vuex.Store({
     },
     readNotice(state) {
       return state.notice
+    },
+    getSystem(state) {
+      return state.system.filter((item) => {
+        return !item.read
+      })
+    },
+    readSystem(state) {
+      return state.system
     }
   },
   modules: {

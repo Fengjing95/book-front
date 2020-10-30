@@ -2,7 +2,7 @@
  * @Date: 2020-10-15 09:22:54
  * @LastEditors: 小枫
  * @description: 动态组件
- * @LastEditTime: 2020-10-28 20:58:57
+ * @LastEditTime: 2020-10-29 15:55:44
  * @FilePath: \book\src\components\Discussion\DynamicItem.vue
 -->
 <template lang="pug">
@@ -97,19 +97,15 @@ import Message from '../../assets/js/Message'
           // closeOnClickModal: true
         }).then(({ value }) => {
           const reportObj = {
-            reportDes: value,
+            description: value,
             targetId: this.dynamicObj.did,
-            reportType: 1
+            reportType: 0
           }
-          // TODO：修改举报链接
-          this.$http.post('/dynamicreview/releasereview', reportObj).then(
+          this.$http.post('/report/addreport', reportObj).then(
             res => {
               if(res) {
-                this.reviewNum++
-                if(this.myId !== this.dynamicObj.userId) {
-                  // TODO：发送举报socket
-                  this.$socket.emit('send_report')
-                }
+                // TODO：发送举报socket
+                // this.$socket.emit('send_report')
                 this.$message.success('提交成功，处理结果将尽快反馈给您')
               }
             }

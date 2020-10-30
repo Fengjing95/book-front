@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-28 15:44:21
+ * @LastEditTime: 2020-10-30 11:15:29
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -22,7 +22,7 @@
     ) {{ item.name }}
 
     el-badge.list(
-      :is-dot="getMessage.length + getNotReadNotice.length!==0",
+      :is-dot="getMessage.length + getNotReadNotice.length + getSystem.length!==0",
       class="item",
       v-if="getToken",
     )
@@ -37,9 +37,9 @@
             command="message"
           ) 消息通知
             el-badge(
-              v-show="getMessage.length + getNotReadNotice.length !== 0",
+              v-show="getMessage.length + getNotReadNotice.length + getSystem.length !== 0",
               class="mark",
-              :value="getMessage.length + getNotReadNotice.length",
+              :value="getMessage.length + getNotReadNotice.length + getSystem.length",
               :max="99"
             )
           el-dropdown-item(
@@ -87,7 +87,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getToken', 'getMessage', 'getNotReadNotice']),  // store中获取token
+    ...mapGetters(['getToken', 'getMessage', 'getNotReadNotice', 'getSystem']),  // store中获取token
     // 绑定路由和菜单栏选中项
     route() {
       return "/" + this.$route.path.replace("/", "")
