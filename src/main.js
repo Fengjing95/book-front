@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-30 10:40:47
+ * @LastEditTime: 2020-11-07 15:36:13
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -121,6 +121,8 @@ axios.interceptors.response.use(response => {
             type: 'error',
             message: error.response.data.msg
           });
+        } else {
+          throw error
         }
         break;
     }

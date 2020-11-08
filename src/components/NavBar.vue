@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-30 11:15:29
+ * @LastEditTime: 2020-11-06 18:39:57
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -81,6 +81,7 @@ export default {
       // 下拉列表项
       list: [
         {icon: 'el-icon-user', command: 'personal', name: '个人中心'},
+        {icon: 'el-icon-upload2', command: 'upload', name: '上传资源'},
         {icon: 'el-icon-date', command: 'attendance', name: '每日签到'},
         {icon: 'el-icon-switch-button', command: 'quit', name: '退出'},
       ],
@@ -103,6 +104,7 @@ export default {
     handleCommand(command) {
       switch(command) {
         case 'quit':
+          this.$socket.emit('logout', {token: this.$store.getters.getToken})
           this.$http.get('/user/logout').then(
             res => {
               if(res) {
@@ -130,6 +132,9 @@ export default {
         case 'message':
           this.$router.push('/message')
           // this.$store.commit('readAllMsg')
+          break;
+        case 'upload':
+          this.$router.push('/upload')
           break;
         default:
           break;

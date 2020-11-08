@@ -2,7 +2,7 @@
  * @Date: 2020-10-26 18:59:54
  * @LastEditors: 小枫
  * @description: 消息中心
- * @LastEditTime: 2020-10-29 21:46:36
+ * @LastEditTime: 2020-11-06 10:58:03
  * @FilePath: \book\src\views\MessageCenter.vue
 -->
 <template lang="pug">
@@ -11,7 +11,7 @@
       el-tab-pane
         span.title(slot="label")
           el-badge(:is-dot="$store.getters.getMessage.length!==0")
-            i.el-icon-message-solid  通知
+            i.el-icon-message-solid  消息
         div(style="text-align: right;margin-right: 20px")
           el-button(size="small", @click="readAll") 全部设为已读
         message-item(

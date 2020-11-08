@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-30 14:51:34
+ * @LastEditTime: 2020-11-07 15:57:42
  * @FilePath: \book\src\App.vue
 -->
 <template lang="pug">
@@ -18,7 +18,8 @@
       close-on-click-modal=false,
       top="20vh",
       close="getPhotoUrl",
-      :destroy-on-close	="true"
+      :destroy-on-close="true"
+      show-close=true
     )
       login-dialog(@closeLogin="closeLoginDialog")
       //- login-dialog/
@@ -118,7 +119,7 @@ export default {
       this.$http.get('/msg/querysystem?pageNumber=1&pageSize=100').then(
         res => {
           if(res) {
-            console.log(res);
+            // console.log(res);
             this.$store.commit('addSystem', res.data.obj.content)
           }
         }

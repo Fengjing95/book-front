@@ -1,8 +1,8 @@
 <!--
  * @Date: 2020-10-10 08:48:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-10 19:20:21
- * @FilePath: \book\src\components\DailyAttendance.vue
+ * @LastEditTime: 2020-11-07 15:17:40
+ * @FilePath: \book\src\components\Attendance\DailyAttendance.vue
 -->
 <template lang="pug">
   .daily-attendance
@@ -11,6 +11,7 @@
       width="500px",
       close-on-click-modal=false,
       top="20vh",
+      show-close=true
     )
       daily-attendance-content(ref="contentRef")
 </template>

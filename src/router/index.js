@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-26 19:34:29
+ * @LastEditTime: 2020-11-06 18:37:57
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
@@ -108,6 +108,17 @@ const routes = [
   {
     path: '/message',
     component: () => import('../views/MessageCenter'),
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getToken) {
+        next()
+      } else {
+        next(from.path)
+      }
+    },
+  },
+  {
+    path: '/upload',
+    component: () => import('../views/Upload'),
     beforeEnter: (to, from, next) => {
       if (store.getters.getToken) {
         next()
