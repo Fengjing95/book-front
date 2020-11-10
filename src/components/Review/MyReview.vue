@@ -2,8 +2,8 @@
  * @Date: 2020-10-18 15:22:31
  * @LastEditors: 小枫
  * @description: 评论组件
- * @LastEditTime: 2020-11-09 20:55:07
- * @FilePath: \book\src\components\MyReview.vue
+ * @LastEditTime: 2020-11-10 09:44:04
+ * @FilePath: \book\src\components\Review\MyReview.vue
 -->
 <template lang="pug">
   .review
@@ -15,20 +15,14 @@
           el-button(
             type="text",
             style="color: #777;padding: 0;",
-            @click="deleteReview",
-            v-if="reviewType === 'dynamic'"
+            @click="deleteReview"
           ) 删除
       .reply(v-if="reviewObj.drPid !== reviewObj.drSpid")
         span(style="color: #777;") 回复 
         span {{reviewObj.repUserPojo ? reviewObj.repUserPojo.userName : '原评论已删除'}}:
       .content
         .content-text {{reviewObj.drContent}}
-        el-button.content-btn(
-          type="text",
-          @click="showForm",
-          :disabled="isBanned",
-          v-if="reviewType === 'dynamic'"
-        ) 回复
+        el-button.content-btn(type="text", @click="showForm", :disabled="isBanned") 回复
       .review-input(v-if="isShowForm", @mousedown.prevent)
         el-input(
           ref="reviewInput",
@@ -47,7 +41,7 @@
 </template>
 
 <script>
-import Message from '../assets/js/Message'
+import Message from '../../assets/js/Message'
   export default {
     props: {
       reviewObj: Object,
@@ -59,11 +53,7 @@ import Message from '../assets/js/Message'
         type: Number,
         default: 0,
       },
-      isBanned: Boolean,
-      reviewType: {
-        type: String,
-        default: 'dynamic'
-      }
+      isBanned: Boolean
     },
     data() {
       return {

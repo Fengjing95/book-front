@@ -2,7 +2,7 @@
  * @Date: 2020-10-15 18:42:21
  * @LastEditors: 小枫
  * @description: 动态详情
- * @LastEditTime: 2020-10-26 16:33:24
+ * @LastEditTime: 2020-11-10 09:43:31
  * @FilePath: \book\src\views\Dynamic.vue
 -->
 <template lang="pug">
@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import MyReview from '../components/MyReview.vue'
+import MyReview from '../components/Review/MyReview.vue'
 import Message from '../assets/js/Message'
   export default {
     props: {

@@ -2,7 +2,7 @@
  * @Date: 2020-11-09 09:54:00
  * @LastEditors: 小枫
  * @description: description
- * @LastEditTime: 2020-11-09 21:36:08
+ * @LastEditTime: 2020-11-10 16:27:48
  * @FilePath: \book\src\views\BookDetail.vue
 -->
 <template lang="pug">
@@ -41,10 +41,18 @@
             .thanks-content 👆本资源由上述用户上传，感谢对本站的大力支持
           .admin-upload(v-else)
             p(style="font-size: 14px; color: #777;") 由书源网整理发布，如果侵犯了您的版权请联系我们
+          el-button(
+            style="float: right;",
+            size="mini",
+            :type="bookDiscussion !== 0 ? 'primary' : 'success'",
+            @click="handleBookDiscussion"
+          ) {{bookDiscussion !== 0 ? '去书圈看看' : '创建书圈'}}
     .review-recommend
       .review-list
         .show-star
-          .star-text 综合评价
+          .star-text
+            span(style="margin-right: 20px") 累计评价 {{totalReviews}}
+            span 综合评价
           el-rate.star(
             v-model="value",
             disabled,
@@ -54,50 +62,246 @@
           )
           el-button(
             size="mini",
-            type="primary"
+            type="primary",
+            @click="reviewVisiable = true",
+            :disabled="isReviewed"
           ) 我也说两句
+        .review
+          book-review(
+            v-for="(item, index) in reviewList",
+            :key="index",
+            :reviewObj="item"
+          )
+        el-pagination(
+          background,
+          hide-on-single-page
+          layout="prev, pager, next",
+          :page-count="allPageNumber",
+          :reviewPageNum="pageNumber",
+          @current-change="currentPageChange",
+        )
       .recommend-list
+    el-dialog(
+      title="满意度评价",
+      :visible.sync="reviewVisiable",
+      close-on-click-modal=false,
+      top="20vh",
+      :destroy-on-close="true"
+      show-close=true
+    )
+      el-form(
+        ref='uploadForm',
+        :model='satisfaction',
+        :rules='rules',
+        size='medium',
+        label-width='100px'
+      )
+        el-form-item(label='评分', prop='value', style="text-align: left;")
+          el-rate(
+            v-model='satisfaction.value',
+            show-text='',
+            :colors="colors"
+          )
+        el-form-item(label='多行文本' prop='reviewContent')
+          el-input(
+            v-model='satisfaction.reviewContent',
+            type='textarea',
+            placeholder='请输入文字评价',
+            :maxlength='255',
+            :autosize='{minRows: 2, maxRows: 3}',
+            :style="{width: '100%'}"
+          )
+      div(slot='footer')
+        el-button(@click='reviewVisiable=false') 取消
+        el-button(type='primary' @click='submitReview') 确定
+    el-dialog(
+        title="创建书圈",
+        :visible.sync="createBookDiscussionVisiable",
+        close-on-click-modal=false,
+        top="20vh",
+        :destroy-on-close="true"
+        show-close=true
+      )
+      el-form(
+        ref='createBookDiscussionFormRef',
+        :model='createBookDiscussionForm',
+        :rules='rules2',
+        size='medium',
+        label-width='100px',
+      )
+        el-form-item(label='书圈名' prop='dbName')
+          el-input(
+            v-model='createBookDiscussionForm.dbName',
+            placeholder='请输入书圈名',
+            :maxlength='20',
+            clearable='',
+            :style="{width: '100%'}",
+          )
+        el-form-item(label='描述' prop='dbDes')
+          el-input(
+            v-model='createBookDiscussionForm.dbDes',
+            type='textarea',
+            placeholder='请输入描述',
+            :maxlength='255',
+            :autosize='{minRows: 2, maxRows: 3}',
+            :style="{width: '100%'}",
+          )
+      div(slot='footer')
+        el-button(@click='createBookDiscussionVisiable = false') 取消
+        el-button(type='primary' @click='createDiscussion') 确定
 </template>
 
 <script>
+import BookReview from '../components/Review/BookReview'
   export default {
+    inject: ['reload'],
     props: {
       bookId: String
     },
-    // computed: {
-    //   userImgSrc() {
-    //     return this.$photoHeader + this.contributor.image 
-    //   },
-    //   bookImgSrc() {
-    //     return this.$photoHeader + this.book.image 
-    //   }
-    // },
+    components: {
+      BookReview,
+    },
     data() {
       return {
+        // 小程序码
         src: 'http://book.img.ireader.com/idc_1/m_1,w_156,h_208,q_100/e1c9fe3c/group6/M00/6C/9B/CmQUNlauC5uETavmAAAAANzPruo172792771.jpg?v=Qr4Ki2iQ',
         book: {},
         contributor: {},
         userImgSrc: '',
         bookImgSrc: '',
-        value: 3.7
+        satisfaction: {
+          value: 0,
+          reviewContent: ''
+        },
+        rules: {
+          value: [{
+            required: true,
+            message: '评分不能为空',
+            trigger: 'change'
+          }],
+          reviewContent: [{
+            required: true,
+            message: '请输入文字评价',
+            trigger: 'blur'
+          }],
+        },
+        rules2: {
+          dbName: [{
+            required: true,
+            message: '请输入书圈名',
+            trigger: 'blur'
+          }],
+          dbDes: [{
+            required: true,
+            message: '请输入描述',
+            trigger: 'blur'
+          }],
+        },
+        colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
+        reviewVisiable: false,
+        value: 0,
+        reviewList: [],
+        pageNumber: 1,
+        allPageNumber: null,
+        totalReviews: '',
+        isReviewed: false,
+        bookDiscussion: 0,
+        createBookDiscussionForm: {
+          discussionCover: '',
+          bookId: '',
+          dbName: '',
+          dbDes: ''
+        },
+        createBookDiscussionVisiable: false
       }
     },
     methods: {
+      handleBookDiscussion() {
+        if(this.bookDiscussion !== 0) {
+          this.$router.push(`/discussion/${this.bookDiscussion}`)
+        } else {
+          this.createBookDiscussionForm.bookId = this.bookId
+          this.createBookDiscussionForm.discussionCover = this.book.image
+          this.createBookDiscussionVisiable = true
+        }
+      },
+      currentPageChange(val) {
+        this.pageNumber = val
+      },
       getBookInfo() {
         this.$http.get(`/book/querybookinfo?bookId=${this.bookId}`).then(
           res => {
             if(res) {
+              // console.log(res);
               this.book = res.data.obj
               this.contributor = res.data.obj.user
               this.userImgSrc = this.$photoHeader + this.contributor.image
               this.bookImgSrc = this.$photoHeader + this.book.image
+              this.value = res.data.obj.value
+              this.isReviewed = res.data.obj.myReview
+              this.bookDiscussion = res.data.obj.discussionId
             }
           }
         )
-      }
+      },
+      getReviewList() {
+        this.$http.get(`/bookreview/querybookreview?bookId=${this.bookId}&pageNumber=${this.pageNumber}&pageSize=15`).then(
+          res => {
+            if(res) {
+              // console.log(res);
+              this.reviewList = res.data.obj.content
+              this.allPageNumber = res.data.obj.totalPages
+              this.totalReviews = res.data.obj.totalSize
+            }
+          }
+        )
+      },
+      submitReview() {
+        this.$refs['uploadForm'].validate(valid => {
+          if (!valid) return
+          if(this.satisfaction.value === 0) {
+            this.$message.error('请选择星级评价')
+            return
+          }
+          const reviewObj = {...this.satisfaction}
+          reviewObj.bookId = this.bookId
+          this.$http.post('/bookreview/postreview', reviewObj).then(
+            res => {
+              if(res) {
+                this.reviewVisiable = false
+                this.$message.success('发布成功')
+                this.reload()
+              }
+            }
+          )
+        })
+      },
+      createDiscussion() {
+        this.$refs['createBookDiscussionFormRef'].validate(valid => {
+          if (!valid) return
+          this.$http.post('/discussions/adddiscussion', this.createBookDiscussionForm).then(
+            res => {
+              if(res) {
+                console.log(res);
+                this.createBookDiscussionVisiable = false
+                this.bookDiscussion = res.data.obj
+                this.$confirm('书圈创建完成，前往查看?', '创建成功', {
+                  confirmButtonText: '瞅一眼',
+                  cancelButtonText: '稍后在看',
+                  type: 'success'
+                }).then(() => {
+                  this.$router.push(`/discussion/${this.bookDiscussion}`)
+                }).catch(() => {})
+              }
+            }
+          )
+          
+        })
+      },
     },
     created () {
       this.getBookInfo()
+      this.getReviewList()
     },
   }
 </script>
@@ -221,10 +425,11 @@
       background-color: #fff;
       width: 694px;
       border-right: solid 1px #f0f0f0;
-      height: 20px;
-      padding: 30px 40px;
+      
       .show-star {
+        padding: 30px 40px;
         display: flex;
+        border-bottom: solid 1px #f0f0f0;
         .star-text {
           font-size: 14px;
           margin-right: 10px;

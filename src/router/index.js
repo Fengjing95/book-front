@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-09 09:56:40
+ * @LastEditTime: 2020-11-10 13:42:52
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
@@ -131,6 +131,17 @@ const routes = [
     path: '/book/:id',
     component: () => import('../views/BookDetail'),
     props: (route) => ({ bookId: route.params.id }),
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getToken) {
+        next()
+      } else {
+        next(from.path)
+      }
+    },
+  },
+  {
+    path: '/history',
+    component: () => import('../views/History'),
     beforeEnter: (to, from, next) => {
       if (store.getters.getToken) {
         next()
