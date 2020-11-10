@@ -55,12 +55,15 @@
                   :value="item.typeId",
                   :disabled="item.disabled"
                 )
+            .btn
+              el-button(type="primary", @click="submitForm") 提交
+              el-button(@click="resetForm") 重置
         el-col(:span="11")
           el-row(:gutter="15")
             el-form-item(label="PDF", prop="resource", required="")
               el-upload(
                 ref="resource",
-                drag
+                drag,
                 :file-list="resourcefileList",
                 :before-upload="resourceBeforeUpload",
                 accept=".pdf",
@@ -81,12 +84,11 @@
                 :before-upload="imageBeforeUpload",
                 accept="image/*",
                 :limit="1",
-                :http-request="uploadImage"
+                :http-request="uploadImage",
+                list-type="picture"
               )
                 el-button(size="small", type="primary", icon="el-icon-upload") 点击上传
-      .btn
-        el-button(type="primary", @click="submitForm") 提交
-        el-button(@click="resetForm") 重置
+      
       p.tips
         span(style="color: #409eff") *tips:
         span 重复资源将不会获取奖励，建议上传之前搜索一下相同文件是否存在
@@ -337,12 +339,14 @@ export default {
             // console.log(res);
             // this.progressVisable = false
             this.formData.resource = res.data.obj
+            this.formData.bookName = file.name.replace('.pdf', '')
             this.uploadOver = true
-            this.overContent = '上传成功，感谢支持'
+            this.overContent = '上传成功，请完善信息后提交'
           }
         }).catch(err => {
           err
           this.uploadOver = true
+          this.resourcefileList = []
           this.overContent = '传输失败，请重试'
         })
       })

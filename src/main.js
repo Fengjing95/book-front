@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-07 15:36:13
+ * @LastEditTime: 2020-11-09 20:00:54
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -23,7 +23,7 @@ const url = 'http://192.168.1.162:8080/'
 // Socket
 Vue.use(
   new VueSocketIO({
-    debug: true,
+    debug: false,
     // connection: socket(`http://192.168.43.168:8081`, {
     connection: socket(`http://192.168.1.162:8081`, {
       path: '',
@@ -137,6 +137,12 @@ axios.interceptors.response.use(response => {
 
 // 绑定axios到Vue原型
 Vue.prototype.$http = axios
+
+// 挂载过滤器=>格式化时间yyyy-mm-dd
+Vue.filter('formatDate2', function (date) {
+  const n = new Date(date)
+  return n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate()
+})
 
 // 挂载过滤器=>格式化时间
 Vue.filter('formatDate', function (date) {

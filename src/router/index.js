@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-06 18:37:57
+ * @LastEditTime: 2020-11-09 09:56:40
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
@@ -119,6 +119,18 @@ const routes = [
   {
     path: '/upload',
     component: () => import('../views/Upload'),
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getToken) {
+        next()
+      } else {
+        next(from.path)
+      }
+    },
+  },
+  {
+    path: '/book/:id',
+    component: () => import('../views/BookDetail'),
+    props: (route) => ({ bookId: route.params.id }),
     beforeEnter: (to, from, next) => {
       if (store.getters.getToken) {
         next()

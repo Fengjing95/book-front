@@ -2,7 +2,7 @@
  * @Date: 2020-10-13 19:50:51
  * @LastEditors: 小枫
  * @description: 书圈卡片组件
- * @LastEditTime: 2020-11-04 15:10:42
+ * @LastEditTime: 2020-11-09 21:07:35
  * @FilePath: \book\src\views\DiscussionDetail.vue
 -->
 <template lang="pug">
@@ -158,7 +158,7 @@ import DynamicItem from '../components/Discussion/DynamicItem.vue';
         this.$http.get(`/dynamic/querydynamic?bdId=${this.bdId}&pageNumber=${this.pageNumber}&pageSize=10`).then(
           res => {
             if(res) {
-              console.log(res);
+              // console.log(res);
               this.dynamicList.push(...res.data.obj.content)
               this.allPageNumber = res.data.obj.totalPages
               this.pageNumber++

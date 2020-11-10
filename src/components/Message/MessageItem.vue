@@ -2,12 +2,12 @@
  * @Date: 2020-10-26 20:22:37
  * @LastEditors: 小枫
  * @description: 消息组件
- * @LastEditTime: 2020-10-30 16:03:28
+ * @LastEditTime: 2020-11-08 19:30:48
  * @FilePath: \book\src\components\Message\MessageItem.vue
 -->
 <template lang="pug">
   .message-item(:class="messageObj.read ? 'read' : 'no-read'", @click.capture="readById")
-    el-avatar(class="avatar", :src="$photoHeader+messageObj.avatarUrl")
+    el-avatar(class="avatar", :src="$photoHeader+messageObj.avatarUrl", :size="40")
     .content
       .date {{messageObj.msgDate | intervalTime}}
       span.username {{messageObj.userName}}
@@ -47,8 +47,11 @@
             }
           )
         }
-      }
+      },
     },
+    // created() {
+    //   console.log(this.messageObj)
+    // },
   }
 </script>
 

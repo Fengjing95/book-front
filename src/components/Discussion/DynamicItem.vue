@@ -2,7 +2,7 @@
  * @Date: 2020-10-15 09:22:54
  * @LastEditors: 小枫
  * @description: 动态组件
- * @LastEditTime: 2020-10-29 15:55:44
+ * @LastEditTime: 2020-11-09 09:43:10
  * @FilePath: \book\src\components\Discussion\DynamicItem.vue
 -->
 <template lang="pug">
@@ -87,7 +87,7 @@ import Message from '../../assets/js/Message'
           }
         )
       },
-      // TODO: 举报
+      // 举报
       toReport() {
         this.$prompt('请输入描述信息（必填）', '举报', {
           confirmButtonText: '坚决举报',
@@ -104,8 +104,8 @@ import Message from '../../assets/js/Message'
           this.$http.post('/report/addreport', reportObj).then(
             res => {
               if(res) {
-                // TODO：发送举报socket
-                // this.$socket.emit('send_report')
+                // 发送举报socket
+                this.$socket.emit('receive_report')
                 this.$message.success('提交成功，处理结果将尽快反馈给您')
               }
             }
