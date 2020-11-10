@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-06 18:39:57
+ * @LastEditTime: 2020-11-10 18:43:51
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -194,13 +194,15 @@ export default {
       margin-top: 10px;
     }
     .search-box {
-      width: 200px;
+      // width: 200px;
       margin-top: 9px;
       margin-right: 30px;
       height: 40px;
       float: right;
-      border: solid 1px #777;
+      // border: solid 1px #777;
       border-radius: 20px;
+      transition: 0.3s;
+      background-color: #f0f0f0;
       input {
         width: 160px;
         border: none;
@@ -211,9 +213,15 @@ export default {
         background-color: rgba(0,0,0,0);
         text-indent: 10px;
         color: #777;
+        transition: 0.3s;
+        &:focus {
+          transition: 0.3s;
+          width: 200px;
+        }
       }
       i {
         padding: 0 10px;
+        color: rgba(0,0,0,.4);
       }
     }
     .btn {

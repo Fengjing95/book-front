@@ -1,8 +1,8 @@
 <!--
  * @Date: 2020-11-09 09:54:00
  * @LastEditors: 小枫
- * @description: description
- * @LastEditTime: 2020-11-10 16:27:48
+ * @description: 书籍详情
+ * @LastEditTime: 2020-11-10 20:57:44
  * @FilePath: \book\src\views\BookDetail.vue
 -->
 <template lang="pug">
@@ -31,6 +31,12 @@
                 size="small",
                 type="danger"
               ) 购买
+              el-button(
+                size="small",
+                :type="!collection ? 'default' : 'primary'",
+                :icon="!collection ? 'el-icon-star-off' : 'el-icon-star-on'",
+                @click="collectionHandle"
+              ) {{!collection ? '收藏' : '已收藏'}}
           .right
             el-image.mobile(fit="fill", src="http://www.ireader.com/index.php?ca=bookdetail.AppOpenQr&bid=10889522")
         .book-thanks(class="pad")
@@ -212,7 +218,8 @@ import BookReview from '../components/Review/BookReview'
           dbName: '',
           dbDes: ''
         },
-        createBookDiscussionVisiable: false
+        createBookDiscussionVisiable: false,
+        collection: false,
       }
     },
     methods: {
@@ -240,6 +247,7 @@ import BookReview from '../components/Review/BookReview'
               this.value = res.data.obj.value
               this.isReviewed = res.data.obj.myReview
               this.bookDiscussion = res.data.obj.discussionId
+              this.collection = res.data.obj.myCollection
             }
           }
         )
@@ -298,6 +306,31 @@ import BookReview from '../components/Review/BookReview'
           
         })
       },
+      collectionHandle() {
+        if(this.collection) {
+          this.collectionOff()
+        } else {
+          this.collectionOn()
+        }
+      },
+      collectionOn() {
+        this.$http.get(`/collection/on?bookId=${this.bookId}`).then(
+          res => {
+            if(res) {
+              this.collection = true
+            }
+          }
+        )
+      },
+      collectionOff() {
+        this.$http.get(`/collection/off?bookId=${this.bookId}`).then(
+          res => {
+            if(res) {
+              this.collection = false
+            }
+          }
+        )
+      }
     },
     created () {
       this.getBookInfo()
