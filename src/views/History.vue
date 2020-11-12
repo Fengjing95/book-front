@@ -2,7 +2,7 @@
  * @Date: 2020-11-10 13:40:14
  * @LastEditors: 小枫
  * @description: description
- * @LastEditTime: 2020-11-10 15:24:23
+ * @LastEditTime: 2020-11-12 09:32:19
  * @FilePath: \book\src\views\History.vue
 -->
 <template lang="pug">
@@ -13,7 +13,7 @@
           i.el-icon-upload
           .
             &nbsp;我的上传
-        el-timeline
+        el-timeline(v-if="uploadList.length !== 0")
           el-timeline-item(
             v-for="item in uploadList",
             :key="item.bookId"
@@ -27,20 +27,22 @@
                   h4.book-name(@click="goToBook(item.bookId)") {{item.bookName}}
                     span(style="color: #777777;") &nbsp;(作者：{{item.author}})
                   .earnings 获得收益{{parseInt((item.bookPrice/11)*10)}}源币
+        div(v-else) 暂无上传记录
         el-pagination(
           background,
-          hide-on-single-page
+          hide-on-single-page,
           layout="prev, pager, next",
           :page-count="uploadAllPageNumber",
           :reviewPageNum="uploadPageNumber",
           @current-change="uploadPageChange",
+          style="text-align: center;"
         )
       el-tab-pane
         span(slot="label")
           i.el-icon-s-finance
           .
             &nbsp;我的解锁
-        p 2
+        div 暂无解锁记录
         el-pagination(
           background,
           hide-on-single-page
@@ -54,7 +56,7 @@
           i.el-icon-s-management
           .
             &nbsp;我的阅读
-        p 3
+        div 暂无阅读记录
         el-pagination(
           background,
           hide-on-single-page

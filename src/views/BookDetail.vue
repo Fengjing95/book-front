@@ -2,7 +2,7 @@
  * @Date: 2020-11-09 09:54:00
  * @LastEditors: 小枫
  * @description: 书籍详情
- * @LastEditTime: 2020-11-10 20:57:44
+ * @LastEditTime: 2020-11-12 18:53:46
  * @FilePath: \book\src\views\BookDetail.vue
 -->
 <template lang="pug">
@@ -22,6 +22,7 @@
         .book-lock-mobile(class="pad")
           .left
             .price 价格：{{book.bookPrice}}源币
+            // TODO：阅读
             .btn
               el-button(
                 size="small",
@@ -234,6 +235,7 @@ import BookReview from '../components/Review/BookReview'
       },
       currentPageChange(val) {
         this.pageNumber = val
+        this.getReviewList()
       },
       getBookInfo() {
         this.$http.get(`/book/querybookinfo?bookId=${this.bookId}`).then(

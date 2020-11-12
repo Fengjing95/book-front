@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-10 18:43:51
+ * @LastEditTime: 2020-11-12 13:58:56
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -53,6 +53,7 @@
       el-button(type="primary", @click="changeLoginDialogStauts") 登录
     .search-box
       input(
+        ref="searchRef",
         type="text",
         v-model="searchText",
         @keyup.enter="search"
@@ -75,7 +76,7 @@ export default {
         { route: "/", name: "首页" },
         { route: "/discussion", name: "书圈" },
         { route: "/history", name: "历史记录" },
-        { route: "/bookcase", name: "我的书架" },
+        { route: "/collection", name: "我的书架" },
         { route: "/about", name: "关于" },
       ],
       // 下拉列表项
@@ -95,10 +96,11 @@ export default {
     },
   },
   methods: {
-    // TODO: 搜索功能
-    // 搜索
+    // 搜索功能
     search() {
-      console.log(this.searchText);
+      this.$router.push(`/classification?search=${this.searchText}`)
+      this.$refs['searchRef'].blur()
+      this.searchText = ''
     },
     // 头像下拉列表指令
     handleCommand(command) {

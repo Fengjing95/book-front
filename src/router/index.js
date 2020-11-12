@@ -1,12 +1,13 @@
 /*
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-10 13:42:52
+ * @LastEditTime: 2020-11-12 13:42:17
  * @FilePath: \book\src\router\index.js
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store'
+import { message as Message } from '../plugins/resetMessage'
 
 Vue.use(VueRouter)
 
@@ -37,6 +38,7 @@ const routes = [
       if (store.getters.getToken) {
         next()
       } else {
+        Message.info('请先登录')
         next(from.path)
       }   
     },
@@ -89,6 +91,7 @@ const routes = [
       if (store.getters.getToken) {
         next()
       } else {
+        Message.info('请先登录')
         next(from.path)
       }
     },
@@ -98,12 +101,28 @@ const routes = [
     name: 'Dynamic',
     props: (route) => ({ dynamicId: route.params.id }),
     component: () => import('../views/Dynamic'),
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getToken) {
+        next()
+      } else {
+        Message.info('请先登录')
+        next(from.path)
+      }
+    },
   },
   {
     path: '/editor/:id',
     name: 'Editor',
     props: (route) => ({ bdId: route.params.id }),
     component: () => import('../views/Editor'),
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getToken) {
+        next()
+      } else {
+        Message.info('请先登录')
+        next(from.path)
+      }
+    },
   },
   {
     path: '/message',
@@ -112,6 +131,7 @@ const routes = [
       if (store.getters.getToken) {
         next()
       } else {
+        Message.info('请先登录')
         next(from.path)
       }
     },
@@ -123,6 +143,7 @@ const routes = [
       if (store.getters.getToken) {
         next()
       } else {
+        Message.info('请先登录')
         next(from.path)
       }
     },
@@ -135,6 +156,7 @@ const routes = [
       if (store.getters.getToken) {
         next()
       } else {
+        Message.info('请先登录')
         next(from.path)
       }
     },
@@ -146,9 +168,27 @@ const routes = [
       if (store.getters.getToken) {
         next()
       } else {
+        Message.info('请先登录')
         next(from.path)
       }
     },
+  },
+  {
+    path: '/collection',
+    component: () => import('../views/Collection'),
+    beforeEnter: (to, from, next) => {
+      if (store.getters.getToken) {
+        next()
+      } else {
+        Message.info('请先登录')
+        next(from.path)
+      }
+    },
+  },
+  {
+    path: '/classification',
+    component: () => import('../views/Classification'),
+    props: (route) => ({search: route.query.search, type: route.query.type})
   },
   // 未命中显示404
   {
