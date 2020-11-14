@@ -2,7 +2,7 @@
  * @Date: 2020-11-12 13:34:10
  * @LastEditors: 小枫
  * @description: 分类&搜索页面
- * @LastEditTime: 2020-11-12 18:56:20
+ * @LastEditTime: 2020-11-13 18:37:54
  * @FilePath: \book\src\views\Classification.vue
 -->
 <template lang="pug">
@@ -13,19 +13,21 @@
       el-button(type="primary", @click="searchHandle") 搜索
     .center-class
       ul
-        li(@click="addClass(0)", :class="{active: 0 === current}") 查看全部
         li(
           v-for="item in typeOptions",
           :key="item.typeId",
           @click="addClass(item.typeId)",
           :class="{active: item.typeId === current}"
         ) {{item.typeName}}
-    .bottom-result
+    .bottom-result(v-if="bookList.length !== 0")
       search-book-item.sty(
         v-for="item in bookList",
         :key="item.bookId",
         :bookObj="item"
       )
+    .no-result(v-else)
+      h4 没有找到你需要的书籍
+      .bgi
     el-pagination(
       background,
       hide-on-single-page
@@ -45,11 +47,11 @@ import SearchBookItem from '../components/SearchBookItem'
     props: {
       search: {
         type: String,
-        default: undefined
+        default: ''
       },
       type: {
         type: String,
-        default: undefined
+        default: '0'
       }
     },
     // watch: {
@@ -62,14 +64,14 @@ import SearchBookItem from '../components/SearchBookItem'
     // },
     created () {
       this.searchInput = this.search
-      this.current = parseInt(this.type) || 0
+      this.current = parseInt(this.type)
       this.getTypeList()
       this.getBookList()
     },
     data() {
       return {
         searchInput: undefined,
-        typeOptions: [],
+        typeOptions: [{typeId: 0, typeName: '查看全部'}],
         bookList: [],
         current: 0,
         pageNumber: 1,
@@ -86,8 +88,7 @@ import SearchBookItem from '../components/SearchBookItem'
         this.$http.get('/booktype/querytype').then(
           res => {
             if(res) {
-              // console.log(res);
-              this.typeOptions = res.data.obj
+              this.typeOptions.push(...res.data.obj)
             }
           }
         )
@@ -172,6 +173,25 @@ import SearchBookItem from '../components/SearchBookItem'
     justify-content: space-between;
     .sty {
       margin-bottom: 20px;
+    }
+  }
+  .no-result {
+    display: flex;
+    position: relative;
+    h4 {
+      color: #777;
+      flex: 1;
+      margin-top: 100px;
+      position: relative;
+      right: 50px;
+    }
+    .bgi {
+      background: url('../assets/svg/no-search.svg') no-repeat 100% 100%;
+      width: 200px;
+      height: 200px;
+      position: relative;
+      right: 250px;
+      top: 30px;
     }
   }
 }

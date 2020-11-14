@@ -2,7 +2,7 @@
  * @Date: 2020-11-12 17:01:33
  * @LastEditors: 小枫
  * @description: 搜索界面书籍item
- * @LastEditTime: 2020-11-12 19:02:42
+ * @LastEditTime: 2020-11-13 14:44:27
  * @FilePath: \book\src\components\SearchBookItem.vue
 -->
 <template lang="pug">

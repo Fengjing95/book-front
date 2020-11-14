@@ -2,7 +2,7 @@
  * @Date: 2020-10-12 09:59:58
  * @LastEditors: 小枫
  * @description: 书圈列表页面
- * @LastEditTime: 2020-10-22 09:49:50
+ * @LastEditTime: 2020-11-13 17:18:45
  * @FilePath: \book\src\views\Discussion.vue
 -->
 <template lang="pug">
@@ -22,7 +22,7 @@
         :key="item.bdId",
         :discussionObj="item",
       )
-      .footer {{canLoading ? '加载中……' : '已经到底了'}}
+    .footer {{canLoading ? '加载中……' : '已经到底了'}}
 </template>
 
 <script>

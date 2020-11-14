@@ -2,16 +2,16 @@
  * @Date: 2020-10-13 18:17:54
  * @LastEditors: 小枫
  * @description: 123
- * @LastEditTime: 2020-10-14 10:57:16
+ * @LastEditTime: 2020-11-13 18:26:46
  * @FilePath: \book\src\components\Discussion\DiscussionItem.vue
 -->
 <template lang="pug">
   //- 点击跳转路由至书圈详情
   .discussion-item(@click="goTo(`/discussion/${discussionObj.bdId}`)")
-    el-avatar(
+    el-image(
       :src="$photoHeader+discussionObj.bdPhoto",
-      shape="square",
-      :size=60,
+      fit="fill"
+      style="width: 42.5px; height: 60px;"
     )
     .dis-about
       .name {{discussionObj.bdName}}

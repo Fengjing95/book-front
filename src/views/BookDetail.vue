@@ -2,7 +2,7 @@
  * @Date: 2020-11-09 09:54:00
  * @LastEditors: 小枫
  * @description: 书籍详情
- * @LastEditTime: 2020-11-12 18:53:46
+ * @LastEditTime: 2020-11-14 11:43:44
  * @FilePath: \book\src\views\BookDetail.vue
 -->
 <template lang="pug">
@@ -26,19 +26,23 @@
             .btn
               el-button(
                 size="small",
-                type="success"
+                type="success",
+                :disabled="!book.bookState",
               ) 免费试读
               el-button(
                 size="small",
-                type="danger"
+                type="danger",
+                :disabled="!book.bookState"
               ) 购买
               el-button(
                 size="small",
                 :type="!collection ? 'default' : 'primary'",
                 :icon="!collection ? 'el-icon-star-off' : 'el-icon-star-on'",
-                @click="collectionHandle"
+                @click="collectionHandle",
+                :disabled="!collection && !book.bookState"
               ) {{!collection ? '收藏' : '已收藏'}}
           .right
+            // TODO 小程序码
             el-image.mobile(fit="fill", src="http://www.ireader.com/index.php?ca=bookdetail.AppOpenQr&bid=10889522")
         .book-thanks(class="pad")
           .user-upload(v-if="contributor.userId !== 1")
@@ -53,6 +57,7 @@
             size="mini",
             :type="bookDiscussion !== 0 ? 'primary' : 'success'",
             @click="handleBookDiscussion"
+            :disabled="bookDiscussion === 0 && !book.bookState"
           ) {{bookDiscussion !== 0 ? '去书圈看看' : '创建书圈'}}
     .review-recommend
       .review-list
@@ -71,14 +76,16 @@
             size="mini",
             type="primary",
             @click="reviewVisiable = true",
-            :disabled="isReviewed"
+            :disabled="isReviewed || !book.bookState"
           ) 我也说两句
-        .review
+        .review(v-if="reviewList.length !== 0")
           book-review(
             v-for="(item, index) in reviewList",
             :key="index",
             :reviewObj="item"
           )
+        .no-review(v-else)
+          h5(style="color: #777;") 还没有人评价过呢
         el-pagination(
           background,
           hide-on-single-page
@@ -88,13 +95,15 @@
           @current-change="currentPageChange",
         )
       .recommend-list
+        .r-title 推荐你看
     el-dialog(
       title="满意度评价",
       :visible.sync="reviewVisiable",
       close-on-click-modal=false,
       top="20vh",
       :destroy-on-close="true"
-      show-close=true
+      show-close=true,
+      width="500px"
     )
       el-form(
         ref='uploadForm',
@@ -250,6 +259,9 @@ import BookReview from '../components/Review/BookReview'
               this.isReviewed = res.data.obj.myReview
               this.bookDiscussion = res.data.obj.discussionId
               this.collection = res.data.obj.myCollection
+              if(!this.book.bookState) {
+                this.$message.info('书籍已下架')
+              }
             }
           }
         )
@@ -377,7 +389,7 @@ import BookReview from '../components/Review/BookReview'
       }
       .shadow {
         position: relative;
-        top: -16px;
+        top: -14px;
       }
     }
     .book-info-right {
@@ -479,7 +491,10 @@ import BookReview from '../components/Review/BookReview'
       }
     }
     .recommend-list {
-      padding: 40px;
+      padding: 20px;
+      .r-title {
+        font-size: 18px;
+      }
     }
   }
 }

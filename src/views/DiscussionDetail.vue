@@ -2,7 +2,7 @@
  * @Date: 2020-10-13 19:50:51
  * @LastEditors: 小枫
  * @description: 书圈卡片组件
- * @LastEditTime: 2020-11-10 16:48:49
+ * @LastEditTime: 2020-11-13 18:25:08
  * @FilePath: \book\src\views\DiscussionDetail.vue
 -->
 <template lang="pug">
@@ -18,11 +18,10 @@
         @click="$router.push(`/editor/${bdId}`)"
       ) 发布动态
     .bd-correlation
-      el-avatar(
-        fit="fill",
+      el-image(
+        fit="cover",
         :src="bdInfo.bdPhoto",
-        shape="square",
-        :size=100,
+        style="width: 75px; height: 100px;"
       )
       .bd-text
         h3
