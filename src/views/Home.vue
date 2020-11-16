@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-09-24 09:58:02
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-14 21:01:47
+ * @LastEditTime: 2020-11-15 10:11:13
  * @FilePath: \book\src\views\Home.vue
 -->
 <template lang="pug">
@@ -17,7 +17,7 @@
           el-carousel-item(v-for='item in carouselList' :key='item.showId')
             el-image(:src="$photoHeader+item.showImage", @click="$router.push(item.showRequest)")
     .top
-      book-top(style="margin-top: 30px", :recommendList="bookTopList")
+      book-top(style="margin-top: 30px", :recommendList="bookTopList", :bestSellList="bestSellList")
       user-top(style="margin-top: 30px", :userList="userTopList")
 </template>
 
@@ -35,6 +35,7 @@ export default {
       carouselList: [],
       userTopList: [],
       bookTopList: [],
+      bestSellList: []
     }
   },
   methods: {
@@ -67,12 +68,22 @@ export default {
           }
         }
       )
+    },
+    getBestSellList() {
+      this.$http.get('/book/top').then(
+        res => {
+          if(res) {
+            this.bestSellList = res.data.obj
+          }
+        }
+      )
     }
   },
   created () {
     this.getCarouselList()
     this.getUserTopList()
     this.getBookTopList()
+    this.getBestSellList()
   },
 }
 </script>

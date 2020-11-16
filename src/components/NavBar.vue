@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-01 08:11:07
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-12 13:58:56
+ * @LastEditTime: 2020-11-15 19:27:33
  * @FilePath: \book\src\components\NavBar.vue
 -->
 <template lang="pug">
@@ -68,6 +68,7 @@ export default {
     // 用户头像
     userPhoto: String
   },
+  inject: ['reload'],
   data() {
     return {
       searchText: '',
@@ -114,6 +115,7 @@ export default {
                   type: 'success',
                   message: '退出成功'
                 })
+                this.reload()
                 window.localStorage.clear()
                 this.$store.commit('freshToken')
               }

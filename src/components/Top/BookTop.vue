@@ -2,7 +2,7 @@
  * @Date: 2020-11-14 15:42:28
  * @LastEditors: 小枫
  * @description: description
- * @LastEditTime: 2020-11-14 21:30:11
+ * @LastEditTime: 2020-11-15 10:38:34
  * @FilePath: \book\src\components\Top\BookTop.vue
 -->
 <template lang="pug">
@@ -20,8 +20,23 @@
           .book-name2(@click="linkToBook(item.bookId)", v-text="item.bookName")
           .book-author2(v-text="item.author")
     .bt-right
-      .fire-icon
-        h3 畅销榜
+      .bt-r-t
+        .fire-icon
+          h3 畅销榜
+      .bt-r-b
+        ul
+          li(
+            v-for="(item, index) in bestSellList"
+            :key="index"
+            :class="{open: index === active, close: index !== active}"
+            @mouseover="isActive(index)"
+          )
+            .rank 
+              div(style="display: inline-block;width: 30px") {{index+1}}
+              span.book-name {{item.bookName}}
+            .book-info(v-if="index === active")
+              el-image.book-image(:src="$photoHeader+item.image", @click="linkToBook(item.bookId)")
+              .info-name(@click="linkToBook(item.bookId)") {{item.bookName}}
 </template>
 
 <script>
@@ -29,6 +44,11 @@
     props: {
       recommendList: Array,
       bestSellList: Array
+    },
+    data() {
+      return {
+        active: 0
+      }
     },
     computed: {
       first() {
@@ -41,6 +61,9 @@
     methods: {
       linkToBook(target) {
         this.$router.push(`/book/${target}`)
+      },
+      isActive(index) {
+        this.active = index
       }
     },
   }
@@ -145,14 +168,79 @@
   .bt-right {
     border-left: solid 1px #f0f0f0;
     width: 283px;
-    padding: 20px 10px;
-    .fire-icon {
-      background: url('../../assets/svg/fire.svg') no-repeat;
-      width: 150px;
-      height: 32px;
-      h3 {
+    .bt-r-t {
+      padding: 15px 20px;
+      // border-bottom: solid 1px #f0f0f0;
+      .fire-icon {
+        background: url('../../assets/svg/fire.svg') no-repeat;
+        width: 100%;
+        height: 32px;
+        text-align: left;
+        h3 {
+          margin: 0 40px;
+          line-height: 32px;
+        }
+      }
+    }
+    .bt-r-b {
+      padding: 14px 10px;
+      box-sizing: border-box;
+      text-align: left;
+      font-size: 14px;
+      ul {
+        list-style: none;
+        padding: 0;
         margin: 0;
-        line-height: 32px;
+        li {
+          border-bottom: solid 1px #f0f0f0;
+        }
+      }
+      .close {
+        height: 36px;
+        line-height: 36px;
+        color: #777;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+      }
+      .open {
+        height: 176px;
+        display: flex;
+        .book-name {
+          display: none;
+        }
+        .rank {
+          color: #777;
+          position: relative;
+          top: 25.5px;
+        }
+        .book-info {
+          margin-top: 25.5px;
+          display: flex;
+          .book-image {
+            width: 94.5px;
+            height: 126px;
+            margin-right: 20px;
+            cursor: pointer;
+          }
+          .info-name {
+            box-sizing: border-box;
+            width: 90px;
+            line-height: 20px;
+            max-height: 40px;
+            text-overflow: -o-ellipsis-lastline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            cursor: pointer;
+            &:hover {
+              color: #83c0ff;
+            }
+          }
+        }
       }
     }
   }

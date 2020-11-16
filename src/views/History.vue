@@ -2,7 +2,7 @@
  * @Date: 2020-11-10 13:40:14
  * @LastEditors: 小枫
  * @description: description
- * @LastEditTime: 2020-11-12 09:32:19
+ * @LastEditTime: 2020-11-16 16:45:57
  * @FilePath: \book\src\views\History.vue
 -->
 <template lang="pug">
@@ -22,7 +22,7 @@
           )
             el-card
               .card
-                el-image.book-image(fit="fill", :src="$photoHeader+item.image")
+                el-image.book-image(fit="fill", :src="$photoHeader+item.image", @click="goToBook(item.bookId)")
                 div
                   h4.book-name(@click="goToBook(item.bookId)") {{item.bookName}}
                     span(style="color: #777777;") &nbsp;(作者：{{item.author}})
@@ -42,7 +42,23 @@
           i.el-icon-s-finance
           .
             &nbsp;我的解锁
-        div 暂无解锁记录
+        el-timeline(v-if="unlockList.length !== 0")
+          el-timeline-item(
+            v-for="item in unlockList",
+            :key="item.limitId"
+            :timestamp='item.limitDate | formatDate2',
+            placement='top',
+          )
+            el-card
+              .card
+                el-image.book-image(fit="fill", :src="$photoHeader+item.book.image", @click="goToBook(item.bookId)")
+                div
+                  h4.book-name(@click="goToBook(item.bookId)") {{item.book.bookName}}
+                    span(style="color: #777777;") &nbsp;(作者：{{item.book.author}})
+                  .earnings 解锁进度：
+                    span(v-if="item.limitAll") 全本解锁
+                    span(v-else) 第{{item.limitPage}}部分
+        div(v-else) 暂无解锁记录
         el-pagination(
           background,
           hide-on-single-page
@@ -84,6 +100,7 @@
     },
     methods: {
       goToBook(bookId) {
+        // 跳转详情
         this.$router.push(`/book/${bookId}`)
       },
       uploadPageChange(val) {
@@ -96,6 +113,7 @@
         this.readPageNumber = val
       },
       getUploadList() {
+        // 获取上传记录
         this.$http.get(`/book/queryupload?pageNumber=${this.uploadPageNumber}&pageSize=10`).then(
           res => {
             if(res) {
@@ -107,16 +125,33 @@
         )
       },
       getUnlock() {
-
+        // 获取解锁记录
+        this.$http.get(`/limit/queryhistory?pageNumber=${this.unlockPageNumber}&pageSize=10`).then(
+          res => {
+            if(res) {
+              // console.log(res);
+              this.unlockList = res.data.obj.content
+              this.unlockAllPageNumber = res.data.obj.totalPages
+            }
+          }
+        )
       },
       getReadList() {
-
+        // TODO获取阅读记录
+        this.$http.get(`/?pageNumber=${this.readPageNumber}&pageSize=10`).then(
+          res => {
+            if(res) {
+              this.readList = res.data.obj.content
+              this.readAllPageNumber = res.data.obj.totalPages
+            }
+          }
+        )
       }
     },
     created () {
       this.getUploadList()
       this.getUnlock()
-      this.getReadList()
+      // this.getReadList()
     },
   }
 </script>
@@ -132,6 +167,7 @@
     .book-image {
       width: 78px;
       height: 104px;
+      cursor: pointer;
     }
     .book-name {
       margin-left: 20px;
