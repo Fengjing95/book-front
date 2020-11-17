@@ -2,7 +2,7 @@
  * @Date: 2020-10-13 18:17:54
  * @LastEditors: 小枫
  * @description: 123
- * @LastEditTime: 2020-11-13 18:26:46
+ * @LastEditTime: 2020-11-17 09:25:58
  * @FilePath: \book\src\components\Discussion\DiscussionItem.vue
 -->
 <template lang="pug">
@@ -11,7 +11,7 @@
     el-image(
       :src="$photoHeader+discussionObj.bdPhoto",
       fit="fill"
-      style="width: 42.5px; height: 60px;"
+      style="width: 42.5px; height: 60px;border: solid 1px #f0f0f0;"
     )
     .dis-about
       .name {{discussionObj.bdName}}

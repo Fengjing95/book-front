@@ -2,7 +2,7 @@
  * @Date: 2020-10-13 19:50:51
  * @LastEditors: 小枫
  * @description: 书圈卡片组件
- * @LastEditTime: 2020-11-13 18:25:08
+ * @LastEditTime: 2020-11-17 09:26:35
  * @FilePath: \book\src\views\DiscussionDetail.vue
 -->
 <template lang="pug">
@@ -21,7 +21,7 @@
       el-image(
         fit="cover",
         :src="bdInfo.bdPhoto",
-        style="width: 75px; height: 100px;"
+        style="width: 75px; height: 100px;border: solid 1px #f0f0f0;"
       )
       .bd-text
         h3

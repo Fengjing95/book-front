@@ -2,7 +2,7 @@
  * @Date: 2020-11-12 17:01:33
  * @LastEditors: 小枫
  * @description: 搜索界面书籍item
- * @LastEditTime: 2020-11-13 14:44:27
+ * @LastEditTime: 2020-11-17 09:32:36
  * @FilePath: \book\src\components\SearchBookItem.vue
 -->
 <template lang="pug">
@@ -46,6 +46,7 @@
     top: 10px;
     right: -10px;
     cursor: pointer;
+    border: solid 1px #f0f0f0;
   }
   .info {
     position: relative;

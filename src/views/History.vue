@@ -2,7 +2,7 @@
  * @Date: 2020-11-10 13:40:14
  * @LastEditors: 小枫
  * @description: description
- * @LastEditTime: 2020-11-16 16:45:57
+ * @LastEditTime: 2020-11-17 09:31:55
  * @FilePath: \book\src\views\History.vue
 -->
 <template lang="pug">
@@ -168,6 +168,7 @@
       width: 78px;
       height: 104px;
       cursor: pointer;
+      border: solid 1px #f0f0f0;
     }
     .book-name {
       margin-left: 20px;

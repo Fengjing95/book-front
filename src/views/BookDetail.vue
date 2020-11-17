@@ -2,7 +2,7 @@
  * @Date: 2020-11-09 09:54:00
  * @LastEditors: 小枫
  * @description: 书籍详情
- * @LastEditTime: 2020-11-16 20:36:31
+ * @LastEditTime: 2020-11-17 14:59:58
  * @FilePath: \book\src\views\BookDetail.vue
 -->
 <template lang="pug">
@@ -22,14 +22,12 @@
       .book-lock-mobile.pad
         .left
           .price 价格<span style="color: #777;">(整本)</span>：{{ book.bookPrice }}源币
-          // TODO：阅读
           .btn
             a(:href="`/api/download/download?bookId=${bookId}&token=${$store.getters.getToken}`" :download="book.bookName+'.pdf'")
               el-button(
                 size="small",
                 type="success",
                 :disabled="!book.bookState || !isAllUnlock",
-                @click="download"
               ) 下载至本地
             el-button(
               size="small",
@@ -46,7 +44,6 @@
               :disabled="!collection && !book.bookState"
             ) {{ !collection ? '收藏' : '已收藏' }}
         .right
-          // TODO 小程序码
           el-image.mobile(
             fit="fill",
             src="http://www.ireader.com/index.php?ca=bookdetail.AppOpenQr&bid=10889522"
@@ -184,7 +181,8 @@
         v-for="index in part",
         :key="index",
         size="small",
-        :disabled="(unlockPart < index && !isAllUnlock) || !book.bookState"
+        :disabled="(unlockPart < index && !isAllUnlock) || !book.bookState",
+        @click="readOnline(index)"
       )
         //- XXX-> 解锁部分的判断
         i.el-icon-lock(v-if="unlockPart < index && !isAllUnlock")
@@ -213,10 +211,27 @@
         @click="unlockAll"
       ) 全部解锁
         .yh
+  el-drawer(
+    :title="`${book.bookName}(${currentPage}/${totalPage})`"
+    :visible.sync="pdfVisiable"
+    direction="ltr"
+    ref="drawer"
+    size="100%"
+  )
+    pdf.pdf(
+      :src="pdfSrc",
+      :page="currentPage",
+    )
+    .left-btn(@click="frontPage")
+      i.el-icon-caret-left
+    .right-btn(@click="nextPage")
+      i.el-icon-caret-right
 </template>
 
 <script>
-import BookReview from "../components/Review/BookReview";
+import BookReview from "../components/Review/BookReview"
+import pdf from 'vue-pdf';
+// var loadingTask = pdf.createLoadingTask('http://image.cache.timepack.cn/nodejs.pdf');
 export default {
   inject: ["reload"],
   props: {
@@ -224,10 +239,11 @@ export default {
   },
   components: {
     BookReview,
+    pdf,
   },
   data() {
     return {
-      // 小程序码
+      // TODO 小程序码
       src:
         "http://book.img.ireader.com/idc_1/m_1,w_156,h_208,q_100/e1c9fe3c/group6/M00/6C/9B/CmQUNlauC5uETavmAAAAANzPruo172792771.jpg?v=Qr4Ki2iQ",
       book: {},
@@ -291,9 +307,19 @@ export default {
       unlockVisiable: false,
       isAllUnlock: false,
       unlockPart: 0,
-      historyRead: 0
+      // 阅读相关
+      historyRead: 0,
+      pdfVisiable: false,
+      currentPage: 1,
+      totalPage: 100,
+      pdfSrc: undefined,
     };
   },
+  //  mounted() {
+  //   this.pdfSrc.promise.then(pdf => {
+  //       this.totalPage = pdf.numPages;
+  //   }).catch(console.log);
+  // },
   computed: {
     part() {
       // 计算总的部分
@@ -469,6 +495,64 @@ export default {
     },
     freeRead() {
       // 免费试读
+      this.currentPage = 1
+      this.totalPage = 10
+      
+      this.$http.get(`/read/tryread?bookId=${this.bookId}`, {
+        headers: {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',},
+        responseType: 'blob',
+      }).then(res => {
+        console.log(res);
+        this.pdfSrc = this.transBlobToUrl(res.data)
+      }).then(
+        this.pdfVisiable = true
+      ).catch(err => {
+        console.log(err)
+      })
+    },
+    readOnline (part) {
+      // 在线阅读
+      if(part === Math.ceil(this.historyRead / 100) && this.historyRead !== 0) {
+        this.currentPage = this.historyRead % 100
+      } else {
+        this.currentPage = 1
+      }
+      if(part === Math.ceil(this.book.bookPage / 100)) {
+        this.totalPage = this.book.bookPage % 100
+      } else {
+        this.totalPage = 100
+      }
+      this.$http.get(`http://image.cache.timepack.cn/nodejs.pdf`, {
+        headers: {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',},
+        responseType: 'blob',
+      }).then(res => {
+        console.log(res);
+        this.pdfSrc = this.transBlobToUrl(res.data)
+      }).then(
+        this.pdfVisiable = true
+      ).catch(err => {
+        console.log(err)
+      })
+    },
+    transBlobToUrl(file) {
+      // 将获取的blob转化为url
+      let url = null;
+        if (window.createObjectURL != undefined) { // basic
+          url = window.createObjectURL(file);
+        } else if (window.webkitURL != undefined) { // webkit or chrome
+          try {
+            url = window.webkitURL.createObjectURL(file);
+          } catch (error) {
+            console.log(error)
+          }
+        } else if (window.URL != undefined) { // mozilla(firefox)
+          try {
+            url = window.URL.createObjectURL(file);
+          } catch (error) {
+            console.log(error)
+          }
+        }
+        return url;
     },
     download() {
       // 下载文件(弃用)
@@ -491,7 +575,19 @@ export default {
       //   }
       // })
       // location.href = '/api/download/download?bookId=20'
-    }
+    },
+    frontPage() {
+      // 上一页
+      if(this.currentPage > 0) {
+        this.currentPage --
+      }
+    },
+    nextPage() {
+      // 下一页
+      if(this.currentPage < this.totalPage) {
+        this.currentPage ++
+      }
+    },
   },
   created() {
     this.getBookInfo()
@@ -534,6 +630,7 @@ export default {
         width: 156px;
         height: 208px;
         z-index: 3;
+        border: solid 1px #f0f0f0;
       }
       .shadow {
         position: relative;
@@ -674,6 +771,53 @@ export default {
       position: absolute;
       top: -1px;
       right: -1px;
+    }
+  }
+  .pdf {
+    width: 540px;
+    margin: 0 auto;
+    border: solid 1px #f0f0f0;
+  }
+  .left-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-320px);
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #409eff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 6px rgba(0,0,0,.12);
+    cursor: pointer;
+    z-index: 5;
+    &:hover {
+      background-color: #f6f6fc;
+    }
+  }
+  .right-btn {
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translateX(320px);
+    background-color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #409eff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 6px rgba(0,0,0,.12);
+    cursor: pointer;
+    z-index: 5;
+    &:hover {
+      background-color: #f6f6fc;
     }
   }
 }

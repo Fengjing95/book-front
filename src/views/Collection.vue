@@ -2,7 +2,7 @@
  * @Date: 2020-11-10 21:28:01
  * @LastEditors: 小枫
  * @description: 我的书架
- * @LastEditTime: 2020-11-11 14:14:50
+ * @LastEditTime: 2020-11-17 09:31:19
  * @FilePath: \book\src\views\Collection.vue
 -->
 <template lang="pug">
@@ -109,6 +109,7 @@ export default {
     z-index: 4;
     overflow-y: hidden;
     overflow-x: visible;
+    
     &:after {
       content: "";
       position: absolute;
@@ -124,10 +125,11 @@ export default {
       z-index: -1;
     }
     img {
-      width: 100px;
+      width: 99px;
       height: 134px;
       cursor: pointer;
-      border-right: solid 3px #f1f0e0;
+      border: solid 1px #f0f0f0;
+      // border-right: solid 3px #f1f0e0;
     }
   }
   .img {

@@ -2,7 +2,7 @@
  * @Date: 2020-11-14 15:42:28
  * @LastEditors: 小枫
  * @description: description
- * @LastEditTime: 2020-11-15 10:38:34
+ * @LastEditTime: 2020-11-17 09:24:13
  * @FilePath: \book\src\components\Top\BookTop.vue
 -->
 <template lang="pug">
@@ -109,6 +109,8 @@
         bottom: 50px;
         right: 50px;
         cursor: pointer;
+        border: solid 1px #f0f0f0;
+        
       }
       .book-name {
         cursor: pointer;
@@ -146,6 +148,7 @@
           width: 104px;
           height: 138.7px;
           cursor: pointer;
+          border: solid 1px #f0f0f0;
         }
         .book-author2 {
           font-size: 13px;
@@ -222,6 +225,7 @@
             height: 126px;
             margin-right: 20px;
             cursor: pointer;
+            border: solid 1px #f0f0f0;
           }
           .info-name {
             box-sizing: border-box;
