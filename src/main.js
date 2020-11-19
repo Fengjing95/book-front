@@ -1,7 +1,7 @@
 /*
  * @Date: 2020-09-24 09:53:10
  * @LastEditors: 小枫
- * @LastEditTime: 2020-11-16 19:33:55
+ * @LastEditTime: 2020-11-18 14:05:11
  * @FilePath: \book\src\main.js
  */
 import Vue from 'vue'
@@ -115,6 +115,12 @@ axios.interceptors.response.use(response => {
         store.commit('freshToken')
         router.push('/')
         break;
+      case 500:
+        Notification.error({
+          title: '服务器崩溃',
+          message: '服务器出现问题，请稍后再试'
+        })
+        break;
       default:
         if (error.response.data.msg) {
           Message({
@@ -133,7 +139,6 @@ axios.interceptors.response.use(response => {
     });
   }
 })
-// TODO 500跳转页面
 
 // 绑定axios到Vue原型
 Vue.prototype.$http = axios

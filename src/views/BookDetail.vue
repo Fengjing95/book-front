@@ -2,7 +2,7 @@
  * @Date: 2020-11-09 09:54:00
  * @LastEditors: 小枫
  * @description: 书籍详情
- * @LastEditTime: 2020-11-17 14:59:58
+ * @LastEditTime: 2020-11-19 15:12:34
  * @FilePath: \book\src\views\BookDetail.vue
 -->
 <template lang="pug">
@@ -44,10 +44,12 @@
               :disabled="!collection && !book.bookState"
             ) {{ !collection ? '收藏' : '已收藏' }}
         .right
-          el-image.mobile(
-            fit="fill",
-            src="http://www.ireader.com/index.php?ca=bookdetail.AppOpenQr&bid=10889522"
-          )
+          .mobile
+            el-image.mobile-img(fit="fill", :src="$photoHeader + 'image/wx-code.png'")
+            .hover-mobile
+              .tips 使用微信扫码打开小程序，在移动端享受极致阅读体验
+              el-image.hover-img(fit="fill", :src="$photoHeader + 'image/wx-code.png'")
+
       .book-thanks.pad
         .user-upload(v-if="contributor.userId !== 1")
           img.medal(src="../assets/svg/medal.svg")
@@ -100,6 +102,11 @@
       )
     .recommend-list
       .r-title 推荐你看
+      .r-list
+        .r-item(v-for="item in recommendList", :key="item.bookId")
+          el-image.r-img(fit="fill", :src="$photoHeader+item.image", @click="routeTo(item.bookId)")
+          .r-bookname(@click="routeTo(item.bookId)") {{item.bookName}}
+          .r-author {{item.author}}
   el-dialog(
     title="满意度评价",
     :visible.sync="reviewVisiable",
@@ -182,6 +189,7 @@
         :key="index",
         size="small",
         :disabled="(unlockPart < index && !isAllUnlock) || !book.bookState",
+        :type="Math.ceil(historyRead/100) === index ? 'primary' : 'default'"
         @click="readOnline(index)"
       )
         //- XXX-> 解锁部分的判断
@@ -222,9 +230,9 @@
       :src="pdfSrc",
       :page="currentPage",
     )
-    .left-btn(@click="frontPage")
+    .left-btn(@click="frontPage", :class="{'banned-use': currentPage <= 1}")
       i.el-icon-caret-left
-    .right-btn(@click="nextPage")
+    .right-btn(@click="nextPage", :class="{'banned-use': currentPage >= totalPage}")
       i.el-icon-caret-right
 </template>
 
@@ -243,9 +251,6 @@ export default {
   },
   data() {
     return {
-      // TODO 小程序码
-      src:
-        "http://book.img.ireader.com/idc_1/m_1,w_156,h_208,q_100/e1c9fe3c/group6/M00/6C/9B/CmQUNlauC5uETavmAAAAANzPruo172792771.jpg?v=Qr4Ki2iQ",
       book: {},
       contributor: {},
       userImgSrc: "",
@@ -309,10 +314,13 @@ export default {
       unlockPart: 0,
       // 阅读相关
       historyRead: 0,
+      currentPart: 1,
       pdfVisiable: false,
       currentPage: 1,
       totalPage: 100,
       pdfSrc: undefined,
+      // 推荐相关
+      recommendList: []
     };
   },
   //  mounted() {
@@ -327,6 +335,17 @@ export default {
     },
   },
   methods: {
+    getRecommendList() {
+      // 获取推荐列表
+      this.$http.get('/cf/cf').then(
+        res => {
+          if(res) {
+            // console.log(res);
+            this.recommendList = res.data.obj
+          }
+        }
+      )
+    },
     handleBookDiscussion() {
       // 书圈按钮控制器
       if (this.bookDiscussion !== 0) {
@@ -452,7 +471,7 @@ export default {
             // console.log(res);
             this.isAllUnlock = res.data.obj.limitAll
             this.unlockPart = res.data.obj.limitPage
-            this.historyRead = res.data.obj.nowPage
+            // this.historyRead = res.data.obj.nowPage
           }
         }
       )
@@ -499,10 +518,10 @@ export default {
       this.totalPage = 10
       
       this.$http.get(`/read/tryread?bookId=${this.bookId}`, {
-        headers: {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',},
+        headers: {'Content-Type': 'application/pdf',},
         responseType: 'blob',
       }).then(res => {
-        console.log(res);
+        // console.log(res);
         this.pdfSrc = this.transBlobToUrl(res.data)
       }).then(
         this.pdfVisiable = true
@@ -522,11 +541,12 @@ export default {
       } else {
         this.totalPage = 100
       }
-      this.$http.get(`http://image.cache.timepack.cn/nodejs.pdf`, {
-        headers: {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',},
+      this.currentPart = part
+      this.$http.get(`/read/read?bookId=${this.bookId}&part=${part}`, {
+        headers: {'Content-Type': 'application/pdf'},
         responseType: 'blob',
       }).then(res => {
-        console.log(res);
+        // console.log(res);
         this.pdfSrc = this.transBlobToUrl(res.data)
       }).then(
         this.pdfVisiable = true
@@ -578,21 +598,53 @@ export default {
     },
     frontPage() {
       // 上一页
-      if(this.currentPage > 0) {
+      if(this.currentPage > 1) {
         this.currentPage --
+        this.sendHistoryRead()
       }
     },
     nextPage() {
       // 下一页
       if(this.currentPage < this.totalPage) {
         this.currentPage ++
+        this.sendHistoryRead()
       }
     },
+    sendHistoryRead() {
+      // 上传阅读记录到云端
+      const historyPage = (this.currentPart - 1) * 100 + this.currentPage
+      this.$http.get(`/history/update?bookId=${this.bookId}&page=${historyPage}`).then(
+        res => {
+          if(res) {
+            this.historyRead = historyPage
+          }
+        }
+      )
+    },
+    getHistory() {
+      // 获取阅读进度
+      this.$http.get(`/history/query?bookId=${this.bookId}`).then(
+        res => {
+          if(res) {
+            this.historyRead = res.data.obj.historyPage
+          }
+        }
+      ).catch(err => {
+        err
+        this.historyRead = 0
+      })
+    },
+    routeTo(bookId) {
+      this.$router.push(`/book/${bookId}`)
+      this.reload()
+    }
   },
   created() {
     this.getBookInfo()
     this.getReviewList()
     this.getUnlockInfo()
+    this.getHistory()
+    this.getRecommendList()
   },
 };
 </script>
@@ -680,9 +732,40 @@ export default {
         .right {
           max-height: 83px;
           .mobile {
-            width: 83px;
-            height: 83px;
-            object-fit: cover;
+            position: relative;
+            .mobile-img {
+              width: 83px;
+              height: 83px;
+              object-fit: cover;
+              
+            }
+            &:hover .hover-mobile {
+              display: block;
+            }
+            .hover-mobile {
+              position: absolute;
+              top: 90px;
+              right: 0;
+              display: none;
+              width: 400px;
+              height: 200px;
+              border: solid 1px #f0f0f0;
+              background-color: #fff;
+              padding: 10px;
+              .tips{
+                float: left;
+                width: 150px;
+                margin-top: 100px;
+                margin-left: 20px;
+                color: #777;
+                font-size: 14px;
+              }
+              .hover-img {
+                width: 200px;
+                height: 200px;
+                float: right;
+              }
+            }
           }
         }
       }
@@ -737,8 +820,51 @@ export default {
     }
     .recommend-list {
       padding: 20px;
+      width: 306px;
+      box-sizing: border-box;
       .r-title {
         font-size: 18px;
+        text-align: left;
+        margin-left: 15px;
+      }
+      .r-list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: space-between;
+        align-items: flex-start;
+        justify-content:space-evenly;
+        .r-item {
+          margin-top: 20px;
+          // margin-left: 10px;
+          .r-img {
+            width: 105px;
+            height: 140px;
+            border: solid 1px #f0f0f0;
+            cursor: pointer;
+          }
+          .r-bookname {
+            margin-top: 10px;
+            text-align: left;
+            width: 105px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            &:hover {
+              color: #60aeff;
+              cursor: pointer;
+            }
+          }
+          .r-author {
+            color: #777;
+            width: 105px;
+            font-size: 14px;
+            text-align: left;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+          }
+        }
       }
     }
   }
@@ -774,7 +900,7 @@ export default {
     }
   }
   .pdf {
-    width: 540px;
+    width: 480px;
     margin: 0 auto;
     border: solid 1px #f0f0f0;
   }
@@ -818,6 +944,13 @@ export default {
     z-index: 5;
     &:hover {
       background-color: #f6f6fc;
+    }
+  }
+  .banned-use {
+    color: #777777;
+    cursor: not-allowed;
+    &:hover {
+      background-color: #fff;
     }
   }
 }

@@ -2,7 +2,7 @@
  * @Date: 2020-11-10 13:40:14
  * @LastEditors: 小枫
  * @description: description
- * @LastEditTime: 2020-11-17 09:31:55
+ * @LastEditTime: 2020-11-18 10:13:40
  * @FilePath: \book\src\views\History.vue
 -->
 <template lang="pug">
@@ -72,7 +72,27 @@
           i.el-icon-s-management
           .
             &nbsp;我的阅读
-        div 暂无阅读记录
+        el-timeline(v-if="readList.length !== 0")
+          el-timeline-item(
+            v-for="item in readList",
+            :key="item.bookId"
+            :timestamp='item.historyDate | formatDate',
+            placement='top',
+          )
+            el-card
+              .card
+                el-image.book-image(fit="fill", :src="$photoHeader+item.book.image", @click="goToBook(item.bookId)")
+                div
+                  h4.book-name(class="move" @click="goToBook(item.bookId)") {{item.book.bookName}}
+                    span(style="color: #777777;") &nbsp;(作者：{{item.book.author}})
+                  .earnings(class="move") 阅读到第{{item.historyPage}}页
+                  el-progress.pro(
+                    :text-inside="true"
+                    :stroke-width="18"
+                    :percentage="parseInt(item.historyPage * 100 / item.book.bookPage)"
+                    :color="colors"
+                  )
+        div(v-else) 暂无阅读记录
         el-pagination(
           background,
           hide-on-single-page
@@ -96,6 +116,13 @@
         readList: [],
         readPageNumber: 1,
         readAllPageNumber: undefined,
+        colors: [
+          {color: '#f56c6c', percentage: 20},
+          {color: '#e6a23c', percentage: 40},
+          {color: '#1989fa', percentage: 60},
+          {color: '#6f7ad3', percentage: 80},
+          {color: '#5cb87a', percentage: 100}
+        ],
       }
     },
     methods: {
@@ -137,10 +164,11 @@
         )
       },
       getReadList() {
-        // TODO获取阅读记录
-        this.$http.get(`/?pageNumber=${this.readPageNumber}&pageSize=10`).then(
+        // 获取阅读记录
+        this.$http.get(`/history/queryall?pageNumber=${this.readPageNumber}&pageSize=10`).then(
           res => {
             if(res) {
+              // console.log(res);
               this.readList = res.data.obj.content
               this.readAllPageNumber = res.data.obj.totalPages
             }
@@ -151,7 +179,7 @@
     created () {
       this.getUploadList()
       this.getUnlock()
-      // this.getReadList()
+      this.getReadList()
     },
   }
 </script>
@@ -177,6 +205,13 @@
     .earnings {
       margin-left: 20px;
       color: #777777;
+    }
+    .pro {
+      margin-left: 20px;
+      width: 154px;
+    }
+    .move {
+      margin-bottom: 10px;
     }
   }
 }
