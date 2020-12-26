@@ -1,7 +1,7 @@
 <!--
  * @Date: 2020-10-08 14:54:06
  * @LastEditors: 小枫
- * @LastEditTime: 2020-10-12 09:57:35
+ * @LastEditTime: 2020-11-21 18:35:10
  * @FilePath: \book\src\components\Personal\PersonalSetting.vue
 -->
 <template lang="pug">
@@ -119,7 +119,7 @@
             this.$http.post('/user/updateusername', this.newUsername).then(
               res => {
                 if(res) {
-                  res
+                  // res
                   this.$message.success('修改成功')
                   this.reload()
                 }

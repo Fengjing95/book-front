@@ -2,7 +2,7 @@
  * @Date: 2020-11-09 09:54:00
  * @LastEditors: 小枫
  * @description: 书籍详情
- * @LastEditTime: 2020-11-19 15:12:34
+ * @LastEditTime: 2020-11-28 17:49:58
  * @FilePath: \book\src\views\BookDetail.vue
 -->
 <template lang="pug">
@@ -107,6 +107,10 @@
           el-image.r-img(fit="fill", :src="$photoHeader+item.image", @click="routeTo(item.bookId)")
           .r-bookname(@click="routeTo(item.bookId)") {{item.bookName}}
           .r-author {{item.author}}
+        //- .r-item
+        //-   el-image.r-img(fit="fill", :src="$photoHeader+'image/QQ截图20201111172145-Vhstpl.png'", @click="routeTo(22)")
+        //-   .r-bookname(@click="routeTo(22)") Java 8函数式编程
+        //-   .r-author [英] Richard Warburton
   el-dialog(
     title="满意度评价",
     :visible.sync="reviewVisiable",
